@@ -3,11 +3,11 @@
 
 #include "MSIXInstallation.hpp"
 
+#include <Windows.h>
 #include <winrt/windows.applicationmodel.h>
 #include <winrt/windows.foundation.collections.h>
 #include <winrt/windows.management.deployment.h>
 
-#include <algorithm>
 #include <ranges>
 
 #include "Versions.hpp"

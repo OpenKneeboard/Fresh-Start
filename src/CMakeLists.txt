@@ -7,8 +7,12 @@ add_executable(
   Versions.hpp
   artifacts/HKCULayer.cpp
   artifacts/HKCULayer.hpp
+  artifacts/HKLMLayer.cpp
+  artifacts/HKLMLayer.hpp
   artifacts/MSIXInstallation.cpp
   artifacts/MSIXInstallation.hpp
+  artifacts/ProgramData.cpp
+  artifacts/ProgramData.hpp
 )
 set_target_properties(
   main

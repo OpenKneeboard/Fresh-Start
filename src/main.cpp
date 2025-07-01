@@ -6,13 +6,15 @@
 #include <ranges>
 
 #include "artifacts/HKCULayer.hpp"
+#include "artifacts/HKLMLayer.hpp"
 #include "artifacts/MSIXInstallation.hpp"
+#include "artifacts/ProgramData.hpp"
 
 namespace fui = FredEmmott::GUI;
 namespace fuii = fui::Immediate;
 
 struct Problem {
-  static constexpr auto RemovableOptions = std::array {
+  static constexpr auto RemovalOptions = std::array {
     "Ignore",
     "Remove",
   };
@@ -29,7 +31,7 @@ struct Problem {
 
   [[nodiscard]]
   const auto& GetOptions() const noexcept {
-    return RemovableOptions;
+    return RemovalOptions;
   }
 
   auto operator->() const {
@@ -46,7 +48,9 @@ auto& GetProblems() {
   if (!std::exchange(initialized, true)) {
     std::unique_ptr<Artifact> artifacts[] {
       std::make_unique<MSIXInstallation>(),
+      std::make_unique<ProgramData>(),
       std::make_unique<HKCULayer>(),
+      std::make_unique<HKLMLayer>(),
     };
     for (auto&& it: artifacts) {
       if (!it->IsPresent()) {
@@ -74,6 +78,11 @@ void ShowProblem(Problem& problem) {
       problem->GetEarliestVersion().mReleaseDate,
       problem->GetLatestVersion()->mName,
       problem->GetLatestVersion()->mReleaseDate);
+  } else {
+    fuii::BodyLabel(
+      "Used by current versions, starting with v{} ({})",
+      problem->GetEarliestVersion().mName,
+      problem->GetEarliestVersion().mReleaseDate);
   }
 
   fuii::BeginCard();
