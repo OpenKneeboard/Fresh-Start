@@ -73,7 +73,7 @@ void ShowProblem(Problem& problem) {
 
   if (problem->GetLatestVersion()) {
     fuii::BodyLabel(
-      "Obsolete: used between v{} ({}) and v{} ({}).",
+      "Obsolete: used from v{} ({}) until v{} ({}).",
       problem->GetEarliestVersion().mName,
       problem->GetEarliestVersion().mReleaseDate,
       problem->GetLatestVersion()->mName,
