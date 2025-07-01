@@ -13,18 +13,18 @@
 namespace fui = FredEmmott::GUI;
 namespace fuii = fui::Immediate;
 
-struct Problem {
+struct ArtifactState {
   static constexpr auto RemovalOptions = std::array {
     "Ignore",
     "Remove",
   };
 
-  Problem() = delete;
-  explicit Problem(std::unique_ptr<Artifact> artifact)
+  ArtifactState() = delete;
+  explicit ArtifactState(std::unique_ptr<Artifact> artifact)
     : mArtifact(std::move(artifact)) {
     if (mArtifact->GetKind() != Artifact::Kind::UserSettings) {
-      if (mArtifact->GetLatestVersion().has_value()) {
-        mSelectedOption = 1;// has latest version? obsolete, remove
+      if (mArtifact->GetRemovedVersion().has_value()) {
+        mSelectedOption = 1;
       }
     }
   }
@@ -38,12 +38,20 @@ struct Problem {
     return mArtifact.get();
   }
 
+  bool IsUserSettings() const {
+    return mArtifact->GetKind() == Artifact::Kind::UserSettings;
+  }
+
+  bool IsOutdated() const {
+    return mArtifact->GetRemovedVersion().has_value();
+  }
+
   std::unique_ptr<Artifact> mArtifact;
   std::size_t mSelectedOption = 0;
 };
 
-auto& GetProblems() {
-  static std::vector<Problem> problems;
+auto& GetArtifacts() {
+  static std::vector<ArtifactState> ret;
   static bool initialized = false;
   if (!std::exchange(initialized, true)) {
     std::unique_ptr<Artifact> artifacts[] {
@@ -56,33 +64,76 @@ auto& GetProblems() {
       if (!it->IsPresent()) {
         continue;
       }
-      problems.emplace_back(std::move(it));
+      ret.emplace_back(std::move(it));
     }
   }
-  return problems;
+  return ret;
 }
 
-void ShowProblem(Problem& problem) {
+void ShowQuickFixes() {
+  fuii::SubtitleLabel("Quick Fixes");
+  fuii::BeginCard();
+  const auto endCard = wil::scope_exit(&fuii::EndCard);
+  fuii::BeginVStackPanel();
+  const auto endStack = wil::scope_exit(&fuii::EndVStackPanel);
+
+  fuii::CaptionLabel("Remove settings as well as software");
+  static bool sRemoveSettings {false};
+  // TODO: should be a checkbox, not a toggleswitch, as it doesn't take instant
+  // action
+  (void)fuii::ToggleSwitch(&sRemoveSettings);
+
+  fuii::BeginHStackPanel();
+  const auto endHStack = wil::scope_exit(&fuii::EndHStackPanel);
+  fuii::Style({
+    .mAlignItems = YGAlignStretch,
+  });
+
+  auto artifacts = GetArtifacts()
+    | std::views::filter([&remove = sRemoveSettings](auto& it) {
+                     return remove ? true : !it.IsUserSettings();
+                   });
+
+  fuii::BeginEnabled(
+    std::ranges::any_of(GetArtifacts(), &ArtifactState::IsOutdated));
+  if (fuii::Button("Remove outdated")) {
+    for (auto&& it: artifacts) {
+      if (!it.IsOutdated()) {
+        continue;
+      }
+      it->Remove();
+    }
+  }
+  fuii::EndEnabled();
+
+  if (fuii::Button("Remove everything")) {
+    for (auto&& it: artifacts) {
+      it->Remove();
+    }
+  }
+}
+
+void ShowArtifact(ArtifactState& artifact) {
   {
     fuii::BeginHStackPanel();
     const auto endStackPanel = wil::scope_exit(&fuii::EndHStackPanel);
-    fuii::SubtitleLabel(problem->GetTitle());
+    fuii::SubtitleLabel(artifact->GetTitle());
     fuii::Style({.mFlexGrow = 1});
-    fuii::ComboBox(&problem.mSelectedOption, problem.GetOptions());
+    fuii::ComboBox(&artifact.mSelectedOption, artifact.GetOptions());
   }
 
-  if (problem->GetLatestVersion()) {
+  if (artifact->GetRemovedVersion()) {
     fuii::BodyLabel(
       "Obsolete: used from v{} ({}) until v{} ({}).",
-      problem->GetEarliestVersion().mName,
-      problem->GetEarliestVersion().mReleaseDate,
-      problem->GetLatestVersion()->mName,
-      problem->GetLatestVersion()->mReleaseDate);
+      artifact->GetEarliestVersion().mName,
+      artifact->GetEarliestVersion().mReleaseDate,
+      artifact->GetRemovedVersion()->mName,
+      artifact->GetRemovedVersion()->mReleaseDate);
   } else {
     fuii::BodyLabel(
       "Used by current versions, starting with v{} ({})",
-      problem->GetEarliestVersion().mName,
-      problem->GetEarliestVersion().mReleaseDate);
+      artifact->GetEarliestVersion().mName,
+      artifact->GetEarliestVersion().mReleaseDate);
   }
 
   fuii::BeginCard();
@@ -90,11 +141,11 @@ void ShowProblem(Problem& problem) {
   fuii::BeginVStackPanel();
   const auto endStack = wil::scope_exit(&fuii::EndVStackPanel);
 
-  fuii::TextBlock(problem->GetDescription());
+  fuii::TextBlock(artifact->GetDescription());
 }
 
 void AppTick(fui::Win32Window&) {
-  auto& problems = GetProblems();
+  auto& artifacts = GetArtifacts();
 
   fuii::BeginVScrollView();
   fuii::Style({
@@ -107,7 +158,7 @@ void AppTick(fui::Win32Window&) {
   fuii::Style({.mGap = 12, .mMargin = 12, .mPadding = 8});
   const auto endVStack = wil::scope_exit(&fuii::EndVStackPanel);
 
-  if (problems.empty()) {
+  if (artifacts.empty()) {
     fuii::BeginCard();
     const auto endCard = wil::scope_exit(&fuii::EndCard);
 
@@ -115,10 +166,12 @@ void AppTick(fui::Win32Window&) {
     return;
   }
 
-  fuii::Label("The following were found on your computer:");
+  fuii::Label("Components of OpenKneeboard were found on your computer.");
 
-  for (auto&& problem: problems) {
-    ShowProblem(problem);
+  ShowQuickFixes();
+
+  for (auto&& problem: artifacts) {
+    ShowArtifact(problem);
   }
 
   fuii::BeginHStackPanel();

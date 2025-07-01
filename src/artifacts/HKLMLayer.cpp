@@ -48,6 +48,6 @@ Version HKLMLayer::GetEarliestVersion() const {
   return Versions::v1_3;
 }
 
-std::optional<Version> HKLMLayer::GetLatestVersion() const {
+std::optional<Version> HKLMLayer::GetRemovedVersion() const {
   return std::nullopt;
 }

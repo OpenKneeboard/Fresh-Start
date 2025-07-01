@@ -16,7 +16,7 @@ class ProgramData final : public Artifact {
   [[nodiscard]] std::string GetDescription() const override;
   [[nodiscard]] Kind GetKind() const override;
   [[nodiscard]] Version GetEarliestVersion() const override;
-  [[nodiscard]] std::optional<Version> GetLatestVersion() const override;
+  [[nodiscard]] std::optional<Version> GetRemovedVersion() const override;
 
  private:
   std::filesystem::path mPath;

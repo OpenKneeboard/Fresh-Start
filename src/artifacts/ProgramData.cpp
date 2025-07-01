@@ -50,6 +50,6 @@ Version ProgramData::GetEarliestVersion() const {
   return Versions::v1_0;
 }
 
-std::optional<Version> ProgramData::GetLatestVersion() const {
+std::optional<Version> ProgramData::GetRemovedVersion() const {
   return Versions::v1_3;
 }

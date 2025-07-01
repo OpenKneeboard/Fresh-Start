@@ -22,5 +22,5 @@ class Artifact {
 
   [[nodiscard]] virtual Kind GetKind() const = 0;
   [[nodiscard]] virtual Version GetEarliestVersion() const = 0;
-  [[nodiscard]] virtual std::optional<Version> GetLatestVersion() const = 0;
+  [[nodiscard]] virtual std::optional<Version> GetRemovedVersion() const = 0;
 };

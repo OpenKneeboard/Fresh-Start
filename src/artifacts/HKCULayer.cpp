@@ -50,6 +50,6 @@ Version HKCULayer::GetEarliestVersion() const {
   return Versions::v0_3;
 }
 
-std::optional<Version> HKCULayer::GetLatestVersion() const {
+std::optional<Version> HKCULayer::GetRemovedVersion() const {
   return Versions::v1_3;
 }

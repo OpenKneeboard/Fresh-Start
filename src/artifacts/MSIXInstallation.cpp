@@ -62,6 +62,6 @@ Version MSIXInstallation::GetEarliestVersion() const {
   return Versions::v0_1;
 }
 
-std::optional<Version> MSIXInstallation::GetLatestVersion() const {
+std::optional<Version> MSIXInstallation::GetRemovedVersion() const {
   return Versions::v1_2;
 }
