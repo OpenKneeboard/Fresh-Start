@@ -36,7 +36,7 @@ std::string_view LocalAppDataSettings::GetTitle() const {
 
 void LocalAppDataSettings::DrawCardContent() const {
   namespace fuii = FredEmmott::GUI::Immediate;
-  fuii::Label("Found {}", mPath.string());
+  fuii::Label("Found in {}", mPath.string());
 }
 
 Artifact::Kind LocalAppDataSettings::GetKind() const {
