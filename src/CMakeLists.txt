@@ -25,6 +25,8 @@ add_executable(
   artifacts/HKCULayer.cpp
   artifacts/HKCULayer.hpp
   artifacts/HKLMLayer.cpp
+  artifacts/LocalAppDataSettings.cpp
+  artifacts/LocalAppDataSettings.hpp
   artifacts/HKLMLayer.hpp
   artifacts/MSIInstallation.cpp
   artifacts/MSIInstallation.hpp

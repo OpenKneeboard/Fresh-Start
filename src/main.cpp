@@ -8,6 +8,7 @@
 
 #include "artifacts/HKCULayer.hpp"
 #include "artifacts/HKLMLayer.hpp"
+#include "artifacts/LocalAppDataSettings.hpp"
 #include "artifacts/MSIInstallation.hpp"
 #include "artifacts/MSIXInstallation.hpp"
 #include "artifacts/MultipleMSIInstallations.hpp"
@@ -69,6 +70,7 @@ auto& GetArtifacts() {
       std::make_unique<HKCULayer>(),
       std::make_unique<HKLMLayer>(),
       std::make_unique<SavedGamesSettings>(),
+      std::make_unique<LocalAppDataSettings>(),
     };
     for (auto&& it: artifacts) {
       if (!it->IsPresent()) {

@@ -44,11 +44,6 @@ std::string_view SavedGamesSettings::GetTitle() const {
 
 void SavedGamesSettings::DrawCardContent() const {
   namespace fuii = FredEmmott::GUI::Immediate;
-  fuii::TextBlock(
-    "Past versions stored settings in 'Saved Games', as this is a familiar to "
-    "players of DCS World. Later versions moved to a more 'correct' location, "
-    "as OpenKneeboard became more widely used outside of the DCS World "
-    "community.");
   fuii::Label("Found in {}", mPath.string());
 }
 
