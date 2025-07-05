@@ -119,7 +119,17 @@ void ShowQuickFixes() {
 
 void ShowArtifact(ArtifactState& artifact) {
   {
-    const auto endStackPanel = fuii::BeginHStackPanel().Scoped();
+    const auto endStackPanel
+      = fuii::BeginHStackPanel().Styled({.mGap = 8}).Scoped();
+    std::string_view icon;
+    switch (artifact->GetKind()) {
+      case Artifact::Kind::Software:
+        icon = "\uECAA";// AppIconDefault
+        break;
+      case Artifact::Kind::UserSettings:
+        icon = "\uEF58";// PlayerSettings
+    }
+    fuii::FontIcon(icon, fui::SystemFont::Subtitle);
     fuii::Label(artifact->GetTitle()).Subtitle().Styled({.mFlexGrow = 1});
     fuii::ComboBox(&artifact.mSelectedOption, artifact.GetOptions());
   }
