@@ -208,6 +208,7 @@ int WINAPI wWinMain(
   fui::WindowOptions options {
     .mTitle = std::format("OKB Fresh Start v{}", Config::Version::Readable),
   };
+  options.mWindowExStyle |= WS_EX_DLGMODALFRAME;
   return fui::Win32Window::WinMain(
     hInstance, hPrevInstance, pCmdLine, nCmdShow, &AppTick, options);
 }
