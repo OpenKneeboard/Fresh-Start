@@ -184,6 +184,10 @@ void AppTick(fui::Win32Window&) {
     const auto endCard = fuii::BeginCard().Scoped();
 
     fuii::Label("No trace of OpenKneeboard was found on your computer.");
+
+    if (fuii::Button("Close").Accent()) {
+      throw fui::ExitException(EXIT_SUCCESS);
+    }
     return;
   }
 
