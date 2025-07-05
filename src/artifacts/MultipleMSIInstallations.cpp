@@ -4,6 +4,8 @@
 
 #include <FredEmmott/GUI.hpp>
 
+#include "Versions.hpp"
+
 MultipleMSIInstallations::MultipleMSIInstallations() : BasicMSIArtifact() {}
 
 void MultipleMSIInstallations::Remove() {}
@@ -23,6 +25,9 @@ void MultipleMSIInstallations::DrawCardContent() const {
     "Installer (MSI). This is unusual and may cause conflicts.");
   const auto subLayout = fuii::BeginVStackPanel().Styled({.mGap = 4}).Scoped();
   for (auto&& it: GetInstallations()) {
-    fuii::Label(" • {}", it.mDescription);
+    fuii::Label(" • Found {}", it.mDescription);
   }
+}
+std::optional<Version> MultipleMSIInstallations::GetRemovedVersion() const {
+  return Versions::v1_10;
 }

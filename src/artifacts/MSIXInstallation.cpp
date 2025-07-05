@@ -18,20 +18,32 @@ MSIXInstallation::MSIXInstallation() {
   for (auto&& package: pm.FindPackagesForUser(L"")) {
     const auto name = package.Id().Name();
     if (std::wstring_view {name}.contains(L"FredEmmott.Self.OpenKneeboard")) {
-      mFullNames.push_back(winrt::to_string(package.Id().FullName()));
+      const auto id = package.Id();
+      const auto version = id.Version();
+      mInstallations.push_back(
+        Installation {
+          .mFullName = winrt::to_string(id.FullName()),
+          .mVersion = std::format(
+            "{}.{}.{}.{}",
+            version.Major,
+            version.Minor,
+            version.Build,
+            version.Revision),
+        });
     }
   }
 }
 
 bool MSIXInstallation::IsPresent() const {
-  return !mFullNames.empty();
+  return !mInstallations.empty();
 }
 
 void MSIXInstallation::Remove() {
   const winrt::Windows::Management::Deployment::PackageManager pm;
   std::vector<decltype(pm.RemovePackageAsync(L""))> operations;
-  for (auto&& fullName: mFullNames) {
-    operations.push_back(pm.RemovePackageAsync(winrt::to_hstring(fullName)));
+  for (auto&& it: mInstallations) {
+    operations.push_back(
+      pm.RemovePackageAsync(winrt::to_hstring(it.mFullName)));
   }
   for (auto&& operation: operations) {
     // FIXME: check for - and return - error
@@ -46,12 +58,12 @@ std::string_view MSIXInstallation::GetTitle() const {
 void MSIXInstallation::DrawCardContent() const {
   namespace fuii = FredEmmott::GUI::Immediate;
   fuii::TextBlock(
-    "MSIX is a Microsoft installation technology that OpenKneeboard no longer "
-    "uses; obsolete installations were found:");
+    "MSIX is a Microsoft installation technology that OpenKneeboard no "
+    "longer uses; old versions are installed:");
 
   const auto subLayout = fuii::BeginVStackPanel().Styled({.mGap = 4}).Scoped();
-  for (auto&& name: mFullNames) {
-    fuii::Label(" • {}", name);
+  for (auto&& it: mInstallations) {
+    fuii::Label(" • Found v{}", it.mVersion);
   }
 }
 

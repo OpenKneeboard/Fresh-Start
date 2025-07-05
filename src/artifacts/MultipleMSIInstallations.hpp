@@ -13,4 +13,6 @@ class MultipleMSIInstallations final : public BasicMSIArtifact {
   void Remove() override;
   [[nodiscard]] std::string_view GetTitle() const override;
   void DrawCardContent() const override;
+  [[nodiscard]]
+  std::optional<Version> GetRemovedVersion() const override;
 };

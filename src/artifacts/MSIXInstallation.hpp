@@ -21,5 +21,13 @@ class MSIXInstallation final : public Artifact {
   [[nodiscard]] std::optional<Version> GetRemovedVersion() const override;
 
  private:
-  std::vector<std::string> mFullNames;
+  struct Installation {
+    std::string mFullName;
+    std::string mVersion;
+
+    auto operator<=>(const Installation& other) const noexcept {
+      return mVersion <=> other.mVersion;
+    }
+  };
+  std::vector<Installation> mInstallations;
 };
