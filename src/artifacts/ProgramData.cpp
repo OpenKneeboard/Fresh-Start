@@ -30,7 +30,7 @@ bool ProgramData::IsPresent() const {
 void ProgramData::Remove() {}
 
 std::string_view ProgramData::GetTitle() const {
-  return "ProgramData Files";
+  return "ProgramData files";
 }
 
 std::string ProgramData::GetDescription() const {

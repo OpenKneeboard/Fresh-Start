@@ -74,7 +74,7 @@ auto& GetArtifacts() {
 }
 
 void ShowQuickFixes() {
-  fuii::Label("Quick Fixes").Subtitle();
+  fuii::Label("All-in-one").Subtitle();
   const auto endCard = fuii::BeginCard().Scoped();
   const auto endStack = fuii::BeginVStackPanel().Scoped();
 

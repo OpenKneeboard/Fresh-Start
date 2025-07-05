@@ -39,7 +39,7 @@ void MSIXInstallation::Remove() {
 }
 
 std::string_view MSIXInstallation::GetTitle() const {
-  return "MSIX Installations";
+  return "MSIX installations";
 }
 
 std::string MSIXInstallation::GetDescription() const {

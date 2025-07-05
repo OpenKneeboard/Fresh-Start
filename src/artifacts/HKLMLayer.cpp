@@ -32,7 +32,7 @@ bool HKLMLayer::IsPresent() const {
 void HKLMLayer::Remove() {}
 
 std::string_view HKLMLayer::GetTitle() const {
-  return "HKLM OpenXR API Layers";
+  return "HKLM OpenXR API layers";
 }
 
 std::string HKLMLayer::GetDescription() const {
