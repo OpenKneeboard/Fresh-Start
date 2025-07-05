@@ -5,6 +5,7 @@
 #include <FredEmmott/GUI/StaticTheme/Common.hpp>
 #include <ranges>
 
+#include "FredEmmott/GUI/ExitException.hpp"
 #include "artifacts/HKCULayer.hpp"
 #include "artifacts/HKLMLayer.hpp"
 #include "artifacts/MSIXInstallation.hpp"
@@ -38,10 +39,12 @@ struct ArtifactState {
     return mArtifact.get();
   }
 
+  [[nodiscard]]
   bool IsUserSettings() const {
     return mArtifact->GetKind() == Artifact::Kind::UserSettings;
   }
 
+  [[nodiscard]]
   bool IsOutdated() const {
     return mArtifact->GetRemovedVersion().has_value();
   }
@@ -71,23 +74,22 @@ auto& GetArtifacts() {
 }
 
 void ShowQuickFixes() {
-  fuii::SubtitleLabel("Quick Fixes");
-  fuii::BeginCard();
-  const auto endCard = wil::scope_exit(&fuii::EndCard);
-  fuii::BeginVStackPanel();
-  const auto endStack = wil::scope_exit(&fuii::EndVStackPanel);
+  fuii::Label("Quick Fixes").Subtitle();
+  const auto endCard = fuii::BeginCard().Scoped();
+  const auto endStack = fuii::BeginVStackPanel().Scoped();
 
-  fuii::CaptionLabel("Remove settings as well as software");
+  fuii::Label("Remove settings as well as software").Caption();
   static bool sRemoveSettings {false};
   // TODO: should be a checkbox, not a toggleswitch, as it doesn't take instant
   // action
   (void)fuii::ToggleSwitch(&sRemoveSettings);
 
-  fuii::BeginHStackPanel();
-  const auto endHStack = wil::scope_exit(&fuii::EndHStackPanel);
-  fuii::Style({
-    .mAlignItems = YGAlignStretch,
-  });
+  const auto endHStack
+    = fuii::BeginHStackPanel()
+        .Styled({
+          .mAlignItems = YGAlignStretch,
+        })
+        .Scoped();
 
   auto artifacts = GetArtifacts()
     | std::views::filter([&remove = sRemoveSettings](auto& it) {
@@ -115,31 +117,29 @@ void ShowQuickFixes() {
 
 void ShowArtifact(ArtifactState& artifact) {
   {
-    fuii::BeginHStackPanel();
-    const auto endStackPanel = wil::scope_exit(&fuii::EndHStackPanel);
-    fuii::SubtitleLabel(artifact->GetTitle());
-    fuii::Style({.mFlexGrow = 1});
+    const auto endStackPanel = fuii::BeginHStackPanel().Scoped();
+    fuii::Label(artifact->GetTitle()).Subtitle().Styled({.mFlexGrow = 1});
     fuii::ComboBox(&artifact.mSelectedOption, artifact.GetOptions());
   }
 
   if (artifact->GetRemovedVersion()) {
-    fuii::BodyLabel(
+    fuii::Label(
       "Obsolete: used from v{} ({}) until v{} ({}).",
       artifact->GetEarliestVersion().mName,
       artifact->GetEarliestVersion().mReleaseDate,
       artifact->GetRemovedVersion()->mName,
-      artifact->GetRemovedVersion()->mReleaseDate);
+      artifact->GetRemovedVersion()->mReleaseDate)
+      .Body();
   } else {
-    fuii::BodyLabel(
+    fuii::Label(
       "Used by current versions, starting with v{} ({})",
       artifact->GetEarliestVersion().mName,
-      artifact->GetEarliestVersion().mReleaseDate);
+      artifact->GetEarliestVersion().mReleaseDate)
+      .Body();
   }
 
-  fuii::BeginCard();
-  const auto endCard = wil::scope_exit(&fuii::EndCard);
-  fuii::BeginVStackPanel();
-  const auto endStack = wil::scope_exit(&fuii::EndVStackPanel);
+  const auto endCard = fuii::BeginCard().Scoped();
+  const auto endStack = fuii::BeginVStackPanel().Scoped();
 
   fuii::TextBlock(artifact->GetDescription());
 }
@@ -147,20 +147,27 @@ void ShowArtifact(ArtifactState& artifact) {
 void AppTick(fui::Win32Window&) {
   auto& artifacts = GetArtifacts();
 
-  fuii::BeginVScrollView();
-  fuii::Style({
-    .mBackgroundColor
-    = fui::StaticTheme::Common::LayerOnAcrylicFillColorDefaultBrush,
-  });
-  const auto endScroll = wil::scope_exit(&fuii::EndVScrollView);
+  /*
+  const auto endScroll
+    = fuii::BeginVScrollView()
+        .Styled({
+          .mBackgroundColor
+          = fui::StaticTheme::Common::LayerOnAcrylicFillColorDefaultBrush,
+        })
+        .Scoped();
+        */
 
-  fuii::BeginVStackPanel();
-  fuii::Style({.mGap = 12, .mMargin = 12, .mPadding = 8});
-  const auto endVStack = wil::scope_exit(&fuii::EndVStackPanel);
+  const auto endVStack
+    = fuii::BeginVStackPanel()
+        .Styled({
+          .mGap = 12,
+          .mMargin = 12,
+          .mPadding = 8,
+        })
+        .Scoped();
 
   if (artifacts.empty()) {
-    fuii::BeginCard();
-    const auto endCard = wil::scope_exit(&fuii::EndCard);
+    const auto endCard = fuii::BeginCard().Scoped();
 
     fuii::Label("No trace of OpenKneeboard was found on your computer.");
     return;
@@ -170,21 +177,18 @@ void AppTick(fui::Win32Window&) {
 
   ShowQuickFixes();
 
-  for (auto&& problem: artifacts) {
+  for (auto&& [index, problem]: std::views::enumerate(artifacts)) {
+    const auto popId = fuii::PushID(index).Scoped();
     ShowArtifact(problem);
   }
 
-  fuii::BeginHStackPanel();
-  const auto endHStack = wil::scope_exit(&fuii::EndHStackPanel);
-  const auto apply = fuii::Button("Apply");
-  fuii::Style({.mFlexGrow = 1});
-  if (apply) {
+  const auto endHStack = fuii::BeginHStackPanel().Scoped();
+  if (fuii::Button("Apply").Accent().Styled({.mFlexGrow = 1})) {
     // TODO
   }
-  const auto cancel = fuii::Button("Cancel");
-  fuii::Style({.mFlexGrow = 1});
-  if (cancel) {
-    // TODO
+
+  if (fuii::Button("Cancel").Styled({.mFlexGrow = 1})) {
+    throw fui::ExitException(EXIT_SUCCESS);
   }
 }
 

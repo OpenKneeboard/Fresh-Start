@@ -48,10 +48,7 @@ std::string MSIXInstallation::GetDescription() const {
     "uses; obsolete installations of OpenKneeboard were found:"
     "\n\n"
     "{}",
-    mFullNames | std::views::transform([](const auto& s) {
-      return std::format("• {}", s);
-    }) | std::views::join_with('\n')
-      | std::ranges::to<std::string>());
+    mFullNames | std::views::join_with('\n') | std::ranges::to<std::string>());
 }
 
 Artifact::Kind MSIXInstallation::GetKind() const {

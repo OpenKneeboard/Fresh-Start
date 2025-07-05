@@ -3,7 +3,7 @@
     {
       "kind": "git",
       "repository": "https://github.com/fredemmott/vcpkg-registry",
-      "baseline": "a1d4d8dedc532568c87b765a014de6ec068e3371",
+      "baseline": "cdc3242b1b47cec333401eca4416010db6380aaa",
       "packages": [
         "fredemmott-gui"
       ]
