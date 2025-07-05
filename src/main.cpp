@@ -74,7 +74,7 @@ auto& GetArtifacts() {
 }
 
 void ShowQuickFixes() {
-  fuii::Label("All-in-one").Subtitle();
+  fuii::Label("Quick cleanup").Subtitle();
   const auto endCard = fuii::BeginCard().Scoped();
   const auto endStack = fuii::BeginVStackPanel().Scoped();
 
@@ -172,7 +172,17 @@ void AppTick(fui::Win32Window&) {
 
   fuii::Label("Components of OpenKneeboard were found on your computer.");
 
-  ShowQuickFixes();
+  static bool sShowDetails {false};
+  {
+    const auto disabled = fuii::BeginDisabled(sShowDetails).Scoped();
+    ShowQuickFixes();
+  }
+  fuii::Label("Show details").Caption();
+  (void)fuii::ToggleSwitch(&sShowDetails);
+
+  if (!sShowDetails) {
+    return;
+  }
 
   for (auto&& [index, problem]: std::views::enumerate(artifacts)) {
     const auto popId = fuii::PushID(index).Scoped();
