@@ -20,12 +20,18 @@ add_executable(
   Artifact.hpp
   Version.hpp
   Versions.hpp
+  artifacts/BasicMSIArtifact.cpp
+  artifacts/BasicMSIArtifact.hpp
   artifacts/HKCULayer.cpp
   artifacts/HKCULayer.hpp
   artifacts/HKLMLayer.cpp
   artifacts/HKLMLayer.hpp
+  artifacts/MSIInstallation.cpp
+  artifacts/MSIInstallation.hpp
   artifacts/MSIXInstallation.cpp
   artifacts/MSIXInstallation.hpp
+  artifacts/MultipleMSIInstallations.cpp
+  artifacts/MultipleMSIInstallations.hpp
   artifacts/ProgramData.cpp
   artifacts/ProgramData.hpp
 )

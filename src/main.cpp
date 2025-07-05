@@ -8,7 +8,9 @@
 
 #include "artifacts/HKCULayer.hpp"
 #include "artifacts/HKLMLayer.hpp"
+#include "artifacts/MSIInstallation.hpp"
 #include "artifacts/MSIXInstallation.hpp"
+#include "artifacts/MultipleMSIInstallations.hpp"
 #include "artifacts/ProgramData.hpp"
 #include "config.hpp"
 
@@ -60,7 +62,9 @@ auto& GetArtifacts() {
   if (!std::exchange(initialized, true)) {
     std::unique_ptr<Artifact> artifacts[] {
       std::make_unique<MSIXInstallation>(),
+      std::make_unique<MultipleMSIInstallations>(),
       std::make_unique<ProgramData>(),
+      std::make_unique<MSIInstallation>(),
       std::make_unique<HKCULayer>(),
       std::make_unique<HKLMLayer>(),
     };
