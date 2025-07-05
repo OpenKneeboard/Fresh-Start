@@ -144,7 +144,6 @@ void ShowArtifact(ArtifactState& artifact) {
 void AppTick(fui::Win32Window&) {
   auto& artifacts = GetArtifacts();
 
-  /*
   const auto endScroll
     = fuii::BeginVScrollView()
         .Styled({
@@ -152,7 +151,6 @@ void AppTick(fui::Win32Window&) {
           = fui::StaticTheme::Common::LayerOnAcrylicFillColorDefaultBrush,
         })
         .Scoped();
-        */
 
   const auto endVStack
     = fuii::BeginVStackPanel()
@@ -178,7 +176,9 @@ void AppTick(fui::Win32Window&) {
     ShowQuickFixes();
   }
   fuii::Label("Show details").Caption();
-  (void)fuii::ToggleSwitch(&sShowDetails);
+  if (fuii::ToggleSwitch(&sShowDetails)) {
+    fuii::ResizeToFit();
+  }
 
   if (!sShowDetails) {
     return;
