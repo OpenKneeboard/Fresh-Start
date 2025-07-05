@@ -12,6 +12,7 @@
 #include "artifacts/MSIXInstallation.hpp"
 #include "artifacts/MultipleMSIInstallations.hpp"
 #include "artifacts/ProgramData.hpp"
+#include "artifacts/SavedGamesSettings.hpp"
 #include "config.hpp"
 
 namespace fui = FredEmmott::GUI;
@@ -67,6 +68,7 @@ auto& GetArtifacts() {
       std::make_unique<MSIInstallation>(),
       std::make_unique<HKCULayer>(),
       std::make_unique<HKLMLayer>(),
+      std::make_unique<SavedGamesSettings>(),
     };
     for (auto&& it: artifacts) {
       if (!it->IsPresent()) {

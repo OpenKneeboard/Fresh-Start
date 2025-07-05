@@ -34,6 +34,8 @@ add_executable(
   artifacts/MultipleMSIInstallations.hpp
   artifacts/ProgramData.cpp
   artifacts/ProgramData.hpp
+  artifacts/SavedGamesSettings.cpp
+  artifacts/SavedGamesSettings.hpp
 )
 set_target_properties(
   main

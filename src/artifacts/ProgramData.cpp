@@ -39,9 +39,8 @@ void ProgramData::DrawCardContent() const {
   fuii::TextBlock(
     "Past versions copied files to ProgramData to avoid compatibility "
     "problems with Windows Store apps, while staying within the "
-    "Microsoft-imposed limits on MSIX applications.\n\n"
-    "These files are in {}.",
-    mPath.string());
+    "Microsoft-imposed limits on MSIX applications.");
+  fuii::Label("Found in {}", mPath.string());
 }
 
 Artifact::Kind ProgramData::GetKind() const {
