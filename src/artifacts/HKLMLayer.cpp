@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include <wil/registry.h>
 
+#include <FredEmmott/GUI.hpp>
+
 #include "Versions.hpp"
 
 HKLMLayer::HKLMLayer() {
@@ -35,9 +37,11 @@ std::string_view HKLMLayer::GetTitle() const {
   return "HKLM OpenXR API layers";
 }
 
-std::string HKLMLayer::GetDescription() const {
-  return "OpenXR API layers are usually installed in the registry under "
-         "HKEY_LOCAL_MACHINE (HKLM).";
+void HKLMLayer::DrawCardContent() const {
+  namespace fuii = FredEmmott::GUI::Immediate;
+  fuii::TextBlock(
+    "OpenXR API layers are usually installed in the registry under "
+    "HKEY_LOCAL_MACHINE (HKLM).");
 }
 
 Artifact::Kind HKLMLayer::GetKind() const {

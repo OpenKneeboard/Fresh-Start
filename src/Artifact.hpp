@@ -18,7 +18,7 @@ class Artifact {
   virtual void Remove() = 0;
 
   [[nodiscard]] virtual std::string_view GetTitle() const = 0;
-  [[nodiscard]] virtual std::string GetDescription() const = 0;
+  virtual void DrawCardContent() const = 0;
 
   [[nodiscard]] virtual Kind GetKind() const = 0;
   [[nodiscard]] virtual Version GetEarliestVersion() const = 0;

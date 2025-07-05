@@ -2,14 +2,7 @@
 // SPDX-License-Identifier: MIT
 #include "MultipleMSIInstallations.hpp"
 
-#include <Windows.h>
-#include <msi.h>
-#include <wil/win32_helpers.h>
-#include <winrt/base.h>
-
-#include "Versions.hpp"
-
-#pragma comment(lib, "msi.lib")
+#include <FredEmmott/GUI.hpp>
 
 MultipleMSIInstallations::MultipleMSIInstallations() : BasicMSIArtifact() {}
 
@@ -23,7 +16,13 @@ std::string_view MultipleMSIInstallations::GetTitle() const {
   return "Multiple MSI installations";
 }
 
-std::string MultipleMSIInstallations::GetDescription() const {
-  return "Multiple versions of the application are installed via Windows "
-         "Installer (MSI). This is unusual and may cause conflicts.";
+void MultipleMSIInstallations::DrawCardContent() const {
+  namespace fuii = FredEmmott::GUI::Immediate;
+  fuii::TextBlock(
+    "Multiple versions of the application are installed via Windows "
+    "Installer (MSI). This is unusual and may cause conflicts.");
+  const auto subLayout = fuii::BeginVStackPanel().Styled({.mGap = 4}).Scoped();
+  for (auto&& it: GetInstallations()) {
+    fuii::Label(" • {}", it.mDescription);
+  }
 }

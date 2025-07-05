@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include <wil/registry.h>
 
+#include <FredEmmott/GUI.hpp>
+
 #include "Versions.hpp"
 
 HKCULayer::HKCULayer() {
@@ -35,11 +37,13 @@ std::string_view HKCULayer::GetTitle() const {
   return "HKCU OpenXR API layers";
 }
 
-std::string HKCULayer::GetDescription() const {
-  return "OpenXR API layers can be installed in the registry either under "
-         "HKEY_LOCAL_MACHINE (HKLM), or under HKEY_CURRENT_USER (HKCU). "
-         "OpenKneeboard originally used HKCU, but now uses HKLM to improve "
-         "compatibility with other software.";
+void HKCULayer::DrawCardContent() const {
+  namespace fuii = FredEmmott::GUI::Immediate;
+  fuii::TextBlock(
+    "OpenXR API layers can be installed in the registry either under "
+    "HKEY_LOCAL_MACHINE (HKLM), or under HKEY_CURRENT_USER (HKCU). "
+    "OpenKneeboard originally used HKCU, but now uses HKLM to improve "
+    "compatibility with other software.");
 }
 
 Artifact::Kind HKCULayer::GetKind() const {

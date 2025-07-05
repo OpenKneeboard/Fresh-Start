@@ -2,14 +2,7 @@
 // SPDX-License-Identifier: MIT
 #include "MSIInstallation.hpp"
 
-#include <Windows.h>
-#include <msi.h>
-#include <wil/win32_helpers.h>
-#include <winrt/base.h>
-
-#include "Versions.hpp"
-
-#pragma comment(lib, "msi.lib")
+#include <FredEmmott/GUI.hpp>
 
 MSIInstallation::MSIInstallation() = default;
 
@@ -23,7 +16,9 @@ std::string_view MSIInstallation::GetTitle() const {
   return "MSI installation";
 }
 
-std::string MSIInstallation::GetDescription() const {
-  return "OpenKneeboard is installed via a Windows Installer (MSI) package.\n\n"
-         "Current versions of OpenKneeboard are installed via MSI.";
+void MSIInstallation::DrawCardContent() const {
+  namespace fuii = FredEmmott::GUI::Immediate;
+  fuii::TextBlock(
+    "OpenKneeboard is installed via a Windows Installer (MSI) package.");
+  fuii::Label("Found {}", GetInstallations().back().mDescription);
 }

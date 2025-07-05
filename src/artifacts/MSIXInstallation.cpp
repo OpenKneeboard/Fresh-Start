@@ -8,6 +8,7 @@
 #include <winrt/windows.foundation.collections.h>
 #include <winrt/windows.management.deployment.h>
 
+#include <FredEmmott/GUI.hpp>
 #include <ranges>
 
 #include "Versions.hpp"
@@ -42,13 +43,16 @@ std::string_view MSIXInstallation::GetTitle() const {
   return "MSIX installations";
 }
 
-std::string MSIXInstallation::GetDescription() const {
-  return std::format(
+void MSIXInstallation::DrawCardContent() const {
+  namespace fuii = FredEmmott::GUI::Immediate;
+  fuii::TextBlock(
     "MSIX is a Microsoft installation technology that OpenKneeboard no longer "
-    "uses; obsolete installations of OpenKneeboard were found:"
-    "\n\n"
-    "{}",
-    mFullNames | std::views::join_with('\n') | std::ranges::to<std::string>());
+    "uses; obsolete installations were found:");
+
+  const auto subLayout = fuii::BeginVStackPanel().Styled({.mGap = 4}).Scoped();
+  for (auto&& name: mFullNames) {
+    fuii::Label(" • {}", name);
+  }
 }
 
 Artifact::Kind MSIXInstallation::GetKind() const {

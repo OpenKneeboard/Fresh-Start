@@ -12,5 +12,5 @@ class MSIInstallation final : public BasicMSIArtifact {
   [[nodiscard]] bool IsPresent() const override;
   void Remove() override;
   [[nodiscard]] std::string_view GetTitle() const override;
-  std::string GetDescription() const override;
+  void DrawCardContent() const override;
 };

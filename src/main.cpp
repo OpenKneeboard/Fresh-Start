@@ -143,7 +143,7 @@ void ShowArtifact(ArtifactState& artifact) {
   const auto endCard = fuii::BeginCard().Scoped();
   const auto endStack = fuii::BeginVStackPanel().Scoped();
 
-  fuii::TextBlock(artifact->GetDescription());
+  artifact->DrawCardContent();
 }
 
 void AppTick(fui::Win32Window&) {
@@ -180,8 +180,7 @@ void AppTick(fui::Win32Window&) {
     const auto disabled = fuii::BeginDisabled(sShowDetails).Scoped();
     ShowQuickFixes();
   }
-  fuii::Label("Show details").Caption();
-  if (fuii::ToggleSwitch(&sShowDetails)) {
+  if (fuii::ToggleSwitch(&sShowDetails).Caption("Show details")) {
     fuii::ResizeToFit();
   }
 

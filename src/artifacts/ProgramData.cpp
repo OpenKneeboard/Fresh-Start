@@ -6,6 +6,7 @@
 #include <shlobj_core.h>
 #include <wil/resource.h>
 
+#include <FredEmmott/GUI.hpp>
 #include <memory>
 
 #include "Versions.hpp"
@@ -33,8 +34,9 @@ std::string_view ProgramData::GetTitle() const {
   return "ProgramData files";
 }
 
-std::string ProgramData::GetDescription() const {
-  return std::format(
+void ProgramData::DrawCardContent() const {
+  namespace fuii = FredEmmott::GUI::Immediate;
+  fuii::TextBlock(
     "Past versions copied files to ProgramData to avoid compatibility "
     "problems with Windows Store apps, while staying within the "
     "Microsoft-imposed limits on MSIX applications.\n\n"
