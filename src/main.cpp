@@ -2,14 +2,15 @@
 #include <winrt/base.h>
 
 #include <FredEmmott/GUI.hpp>
+#include <FredEmmott/GUI/ExitException.hpp>
 #include <FredEmmott/GUI/StaticTheme/Common.hpp>
 #include <ranges>
 
-#include "FredEmmott/GUI/ExitException.hpp"
 #include "artifacts/HKCULayer.hpp"
 #include "artifacts/HKLMLayer.hpp"
 #include "artifacts/MSIXInstallation.hpp"
 #include "artifacts/ProgramData.hpp"
+#include "config.hpp"
 
 namespace fui = FredEmmott::GUI;
 namespace fuii = fui::Immediate;
@@ -204,11 +205,9 @@ int WINAPI wWinMain(
   [[maybe_unused]] HINSTANCE hPrevInstance,
   [[maybe_unused]] PWSTR pCmdLine,
   [[maybe_unused]] int nCmdShow) {
+  fui::WindowOptions options {
+    .mTitle = std::format("OKB Fresh Start v{}", Config::Version::Readable),
+  };
   return fui::Win32Window::WinMain(
-    hInstance,
-    hPrevInstance,
-    pCmdLine,
-    nCmdShow,
-    &AppTick,
-    {"OKB Removal Tool"});
+    hInstance, hPrevInstance, pCmdLine, nCmdShow, &AppTick, options);
 }
