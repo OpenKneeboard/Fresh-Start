@@ -9,7 +9,7 @@ include(cmake/hybrid-crt.cmake)
 
 set(VERSION_TWEAK 0 CACHE STRING "Final numeric component of version number")
 set(VERSION_TWEAK_PREFIX "" CACHE STRING "String prefix for final component of version number")
-project(OpenKneeboard-Removal-Tool VERSION 0.0.1.${VERSION_TWEAK} LANGUAGES CXX)
+project(OKB-Fresh-Start VERSION 0.0.1.${VERSION_TWEAK} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
