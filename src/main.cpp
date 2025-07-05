@@ -78,11 +78,8 @@ void ShowQuickFixes() {
   const auto endCard = fuii::BeginCard().Scoped();
   const auto endStack = fuii::BeginVStackPanel().Scoped();
 
-  fuii::Label("Remove settings as well as software").Caption();
   static bool sRemoveSettings {false};
-  // TODO: should be a checkbox, not a toggleswitch, as it doesn't take instant
-  // action
-  (void)fuii::ToggleSwitch(&sRemoveSettings);
+  (void)fuii::CheckBox(&sRemoveSettings, "Remove settings as well as software");
 
   const auto endHStack
     = fuii::BeginHStackPanel()
