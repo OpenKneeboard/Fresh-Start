@@ -4,31 +4,30 @@
 
 #include <Windows.h>
 #include <wil/registry.h>
+#include <winrt/base.h>
 
 #include <FredEmmott/GUI.hpp>
 
 #include "Versions.hpp"
 
 HKCULayer::HKCULayer() {
-  wil::unique_hkey key;
   if (!SUCCEEDED(
         wil::reg::open_unique_key_nothrow(
           HKEY_CURRENT_USER,
           L"Software\\Khronos\\OpenXR\\1\\ApiLayers\\Implicit",
-          key))) {
+          mKey))) {
     return;
   }
   for (auto&& value: wil::make_range(
-         wil::reg::value_iterator {key.get()}, wil::reg::value_iterator {})) {
+         wil::reg::value_iterator {mKey.get()}, wil::reg::value_iterator {})) {
     if (value.name.contains(L"OpenKneeboard")) {
-      mIsPresent = true;
-      return;
+      mValues.push_back(winrt::to_string(value.name));
     }
   }
 }
 
 bool HKCULayer::IsPresent() const {
-  return mIsPresent;
+  return !mValues.empty();
 }
 
 void HKCULayer::Remove() {}
@@ -38,12 +37,31 @@ std::string_view HKCULayer::GetTitle() const {
 }
 
 void HKCULayer::DrawCardContent() const {
+  namespace fui = FredEmmott::GUI;
   namespace fuii = FredEmmott::GUI::Immediate;
   fuii::TextBlock(
     "OpenXR API layers can be installed in the registry either under "
     "HKEY_LOCAL_MACHINE (HKLM), or under HKEY_CURRENT_USER (HKCU). "
     "OpenKneeboard originally used HKCU, but now uses HKLM to improve "
     "compatibility with other software.");
+
+  static bool sShowWindow = false;
+  if (fuii::Button("Show layers")
+        .Styled({.mFont = {fui::SystemFont::Caption}})) {
+    sShowWindow = true;
+  }
+  if (const auto window = fuii::BeginPopup(&sShowWindow).Scoped()) {
+    const auto layout
+      = fuii::BeginVStackPanel()
+          .Styled({
+            .mGap = 12,
+            .mMargin = 8,
+          })
+          .Scoped();
+    for (auto&& [index, value]: std::views::enumerate(mValues)) {
+      fuii::Label(value, fuii::ID {index});
+    }
+  }
 }
 
 Artifact::Kind HKCULayer::GetKind() const {

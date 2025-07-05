@@ -4,31 +4,31 @@
 
 #include <Windows.h>
 #include <wil/registry.h>
+#include <winrt/base.h>
 
 #include <FredEmmott/GUI.hpp>
 
 #include "Versions.hpp"
 
 HKLMLayer::HKLMLayer() {
-  wil::unique_hkey key;
   if (!SUCCEEDED(
         wil::reg::open_unique_key_nothrow(
           HKEY_LOCAL_MACHINE,
           L"SOFTWARE\\Khronos\\OpenXR\\1\\ApiLayers\\Implicit",
-          key))) {
+          mKey))) {
     return;
   }
   for (auto&& value: wil::make_range(
-         wil::reg::value_iterator {key.get()}, wil::reg::value_iterator {})) {
+         wil::reg::value_iterator {mKey.get()}, wil::reg::value_iterator {})) {
     if (value.name.contains(L"OpenKneeboard")) {
-      mIsPresent = true;
+      mValues.push_back(winrt::to_string(value.name));
       return;
     }
   }
 }
 
 bool HKLMLayer::IsPresent() const {
-  return mIsPresent;
+  return !mValues.empty();
 }
 
 void HKLMLayer::Remove() {}

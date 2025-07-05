@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
+#include <Windows.h>
+#include <wil/registry.h>
+
 #include "Artifact.hpp"
 
 class HKCULayer final : public Artifact {
@@ -17,5 +20,6 @@ class HKCULayer final : public Artifact {
   [[nodiscard]] std::optional<Version> GetRemovedVersion() const override;
 
  private:
-  bool mIsPresent {false};
+  wil::unique_hkey mKey;
+  std::vector<std::string> mValues;
 };
