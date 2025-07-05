@@ -85,7 +85,8 @@ auto& GetArtifacts() {
 void ShowQuickFixes() {
   fuii::Label("Quick cleanup").Subtitle();
   const auto endCard = fuii::BeginCard().Scoped();
-  const auto endStack = fuii::BeginVStackPanel().Scoped();
+  const auto endStack
+    = fuii::BeginVStackPanel().Styled({.mFlexGrow = 1}).Scoped();
 
   static bool sRemoveSettings {false};
   (void)fuii::CheckBox(&sRemoveSettings, "Remove settings as well as software");
@@ -94,6 +95,8 @@ void ShowQuickFixes() {
     = fuii::BeginHStackPanel()
         .Styled({
           .mAlignItems = YGAlignStretch,
+          .mAlignSelf = YGAlignStretch,
+          .mFlexGrow = 1,
         })
         .Scoped();
 
@@ -104,7 +107,7 @@ void ShowQuickFixes() {
 
   fuii::BeginEnabled(
     std::ranges::any_of(GetArtifacts(), &ArtifactState::IsOutdated));
-  if (fuii::Button("Remove outdated")) {
+  if (fuii::Button("Remove outdated").Styled({.mFlexGrow = 1})) {
     for (auto&& it: artifacts) {
       if (!it.IsOutdated()) {
         continue;
@@ -114,7 +117,7 @@ void ShowQuickFixes() {
   }
   fuii::EndEnabled();
 
-  if (fuii::Button("Remove everything")) {
+  if (fuii::Button("Remove everything").Styled({.mFlexGrow = 1})) {
     for (auto&& it: artifacts) {
       it->Remove();
     }
