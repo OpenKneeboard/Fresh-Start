@@ -44,23 +44,20 @@ void HKCULayer::DrawCardContent() const {
     "HKEY_LOCAL_MACHINE (HKLM), or under HKEY_CURRENT_USER (HKCU). "
     "OpenKneeboard originally used HKCU, but now uses HKLM to improve "
     "compatibility with other software.");
+}
 
-  static bool sShowWindow = false;
-  if (fuii::Button("Show layers")
-        .Styled({.mFont = {fui::SystemFont::Caption}})) {
-    sShowWindow = true;
-  }
-  if (const auto window = fuii::BeginPopup(&sShowWindow).Scoped()) {
-    const auto layout
-      = fuii::BeginVStackPanel()
-          .Styled({
-            .mGap = 12,
-            .mMargin = 8,
-          })
-          .Scoped();
-    for (auto&& [index, value]: std::views::enumerate(mValues)) {
-      fuii::Label(value, fuii::ID {index});
-    }
+void HKCULayer::DrawDetails() const {
+  namespace fui = FredEmmott::GUI;
+  namespace fuii = FredEmmott::GUI::Immediate;
+  const auto layout
+    = fuii::BeginVStackPanel()
+        .Styled({
+          .mGap = 12,
+          .mMargin = 8,
+        })
+        .Scoped();
+  for (auto&& [index, value]: std::views::enumerate(mValues)) {
+    fuii::Label(value, fuii::ID {index});
   }
 }
 

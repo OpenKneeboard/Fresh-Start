@@ -57,6 +57,7 @@ struct ArtifactState {
 
   std::unique_ptr<Artifact> mArtifact;
   std::size_t mSelectedOption = 0;
+  bool mShowingDetails = false;
 };
 
 auto& GetArtifacts() {
@@ -144,7 +145,6 @@ void ShowArtifact(ArtifactState& artifact) {
     }
     fuii::FontIcon(icon, fui::SystemFont::Subtitle);
     fuii::Label(artifact->GetTitle()).Subtitle().Styled({.mFlexGrow = 1});
-    fuii::ComboBox(&artifact.mSelectedOption, artifact.GetOptions());
   }
 
   if (artifact->GetRemovedVersion()) {
@@ -167,6 +167,32 @@ void ShowArtifact(ArtifactState& artifact) {
   const auto endStack = fuii::BeginVStackPanel().Scoped();
 
   artifact->DrawCardContent();
+  const auto actions = fuii::BeginHStackPanel().Scoped();
+  fuii::ComboBox(&artifact.mSelectedOption, artifact.GetOptions())
+    .Styled({
+      .mBackgroundColor = fui::Colors::Red,
+      .mMinWidth = 200,
+    });
+
+  const auto details
+    = dynamic_cast<ArtifactWithDetails*>(artifact.mArtifact.get());
+  const auto disabled = fuii::BeginEnabled(details).Scoped();
+  {
+    bool clicked {false};
+    const auto button
+      = fuii::BeginButton(&clicked)
+          .Styled({
+            .mAlignSelf = YGAlignStretch,
+          })
+          .Scoped();
+    fuii::FontIcon("\uea1f");// info2
+    if (clicked) {
+      artifact.mShowingDetails = true;
+    }
+  }
+  if (const auto popup = fuii::BeginPopup(&artifact.mShowingDetails).Scoped()) {
+    details->DrawDetails();
+  }
 }
 
 void ShowContent() {
