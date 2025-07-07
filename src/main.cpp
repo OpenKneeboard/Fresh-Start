@@ -3,6 +3,7 @@
 
 #include <FredEmmott/GUI.hpp>
 #include <FredEmmott/GUI/ExitException.hpp>
+#include <FredEmmott/GUI/Immediate/ContentDialog.hpp>
 #include <FredEmmott/GUI/StaticTheme/Common.hpp>
 #include <ranges>
 
@@ -79,6 +80,11 @@ auto& GetArtifacts() {
       ret.emplace_back(std::move(it));
     }
   }
+  return ret;
+}
+
+bool& ShowDetails() {
+  static bool ret = false;
   return ret;
 }
 
@@ -163,10 +169,10 @@ void ShowArtifact(ArtifactState& artifact) {
   artifact->DrawCardContent();
 }
 
-void AppTick(fui::Win32Window&) {
+void ShowContent() {
   auto& artifacts = GetArtifacts();
 
-  const auto endScroll
+  const auto contentScroll
     = fuii::BeginVScrollView()
         .Styled({
           .mBackgroundColor
@@ -174,7 +180,7 @@ void AppTick(fui::Win32Window&) {
         })
         .Scoped();
 
-  const auto endVStack
+  const auto contentLayout
     = fuii::BeginVStackPanel()
         .Styled({
           .mGap = 12,
@@ -196,16 +202,15 @@ void AppTick(fui::Win32Window&) {
 
   fuii::Label("Components of OpenKneeboard were found on your computer.");
 
-  static bool sShowDetails {false};
   {
-    const auto disabled = fuii::BeginDisabled(sShowDetails).Scoped();
+    const auto disabled = fuii::BeginDisabled(ShowDetails()).Scoped();
     ShowQuickFixes();
   }
-  if (fuii::ToggleSwitch(&sShowDetails).Caption("Show details")) {
+  if (fuii::ToggleSwitch(&ShowDetails()).Caption("Show details")) {
     fuii::ResizeToFit();
   }
 
-  if (!sShowDetails) {
+  if (!ShowDetails()) {
     return;
   }
 
@@ -213,13 +218,20 @@ void AppTick(fui::Win32Window&) {
     const auto popId = fuii::PushID(index).Scoped();
     ShowArtifact(problem);
   }
+}
 
-  const auto endHStack = fuii::BeginHStackPanel().Scoped();
-  if (fuii::Button("Apply").Accent().Styled({.mFlexGrow = 1})) {
-    // TODO
+void AppTick(fui::Win32Window&) {
+  const auto outer = fuii::BeginVStackPanel().Styled({.mGap = 0}).Scoped();
+
+  ShowContent();
+
+  if (!ShowDetails()) {
+    return;
   }
 
-  if (fuii::Button("Cancel").Styled({.mFlexGrow = 1})) {
+  const auto buttons = fuii::BeginContentDialogButtons().Scoped();
+  fuii::ContentDialogPrimaryButton("Clean up").Accent();
+  if (fuii::ContentDialogCloseButton("Close")) {
     throw fui::ExitException(EXIT_SUCCESS);
   }
 }
