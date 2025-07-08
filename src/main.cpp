@@ -170,7 +170,6 @@ void ShowArtifact(ArtifactState& artifact) {
   const auto actions = fuii::BeginHStackPanel().Scoped();
   fuii::ComboBox(&artifact.mSelectedOption, artifact.GetOptions())
     .Styled({
-      .mBackgroundColor = fui::Colors::Red,
       .mMinWidth = 200,
     });
 
