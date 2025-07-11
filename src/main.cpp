@@ -232,6 +232,7 @@ void ShowArtifacts() {
 
 void ShowContent(fui::Win32Window& window) {
   static const fui::Style ContentLayoutStyle {
+    .mFlexGrow = 1,
     .mGap = 12,
     .mMargin = 12,
     .mPadding = 8,
@@ -257,6 +258,7 @@ void ShowContent(fui::Win32Window& window) {
   window.SetResizeMode(
     fui::Window::ResizeMode::Fixed, fui::Window::ResizeMode::AllowShrink);
   const auto scroll = fuii::BeginVScrollView().Scoped().Styled({
+    .mFlexGrow = 1,
     .mFlexShrink = 1,
   });
   const auto layout
@@ -266,11 +268,20 @@ void ShowContent(fui::Win32Window& window) {
 }
 
 void AppTick(fui::Win32Window& window) {
+  const auto resizeIfNeeded
+    = wil::scope_exit([wasCustom = gCleanupMode == CleanupMode::Custom] {
+        const auto isCustom = gCleanupMode == CleanupMode::Custom;
+        if (wasCustom != isCustom) {
+          fuii::ResizeToFit();
+        }
+      });
+
   const auto outer
     = fuii::BeginVStackPanel()
         .Styled({
           .mBackgroundColor
           = fui::StaticTheme::Common::LayerOnAcrylicFillColorDefaultBrush,
+          .mFlexGrow = 1,
           .mGap = 0,
         })
         .Scoped();
