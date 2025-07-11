@@ -11,32 +11,30 @@
 
 #include "Versions.hpp"
 
-SavedGamesSettings::SavedGamesSettings() {
+namespace {
+std::filesystem::path GetPathForConstructor() {
   wil::unique_hlocal_string path;
   if (FAILED(SHGetKnownFolderPath(
         FOLDERID_SavedGames, 0, nullptr, std::out_ptr(path)))) {
-    return;
+    return {};
   }
-  mPath
+  const auto ret
     = std::filesystem::path {std::wstring_view {path.get()}} / L"OpenKneeboard";
-  if (!std::filesystem::exists(mPath)) {
-    mPath.clear();
-    return;
+  if (!std::filesystem::exists(ret)) {
+    return {};
   }
 
-  for (auto&& file: std::filesystem::directory_iterator {mPath}) {
+  for (auto&& file: std::filesystem::directory_iterator {ret}) {
     if (file.path().extension() == L".json") {
-      return;
+      return ret;
     }
   }
-  mPath.clear();
+  return {};
 }
+}// namespace
 
-bool SavedGamesSettings::IsPresent() const {
-  return !mPath.empty();
-}
-
-void SavedGamesSettings::Remove() {}
+SavedGamesSettings::SavedGamesSettings()
+  : FilesystemArtifact {GetPathForConstructor()} {}
 
 std::string_view SavedGamesSettings::GetTitle() const {
   return "Settings in 'Saved Games'";

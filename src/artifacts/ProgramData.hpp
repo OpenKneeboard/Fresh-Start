@@ -2,22 +2,16 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
-#include <filesystem>
-
 #include "Artifact.hpp"
+#include "FilesystemArtifact.hpp"
 
-class ProgramData final : public Artifact {
+class ProgramData final : public FilesystemArtifact {
  public:
   ProgramData();
   ~ProgramData() override = default;
-  [[nodiscard]] bool IsPresent() const override;
-  void Remove() override;
   [[nodiscard]] std::string_view GetTitle() const override;
   void DrawCardContent() const override;
-  [[nodiscard]] Kind GetKind() const override;
   [[nodiscard]] Version GetEarliestVersion() const override;
   [[nodiscard]] std::optional<Version> GetRemovedVersion() const override;
-
- private:
-  std::filesystem::path mPath;
+  Kind GetKind() const override;
 };

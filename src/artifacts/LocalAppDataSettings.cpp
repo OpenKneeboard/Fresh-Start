@@ -11,24 +11,24 @@
 
 #include "Versions.hpp"
 
-LocalAppDataSettings::LocalAppDataSettings() {
+namespace {
+std::filesystem::path GetPathForConstructor() {
   wil::unique_hlocal_string path;
   if (FAILED(SHGetKnownFolderPath(
         FOLDERID_LocalAppData, 0, nullptr, std::out_ptr(path)))) {
-    return;
+    return {};
   }
-  mPath
+  const auto ret
     = std::filesystem::path {std::wstring_view {path.get()}} / L"OpenKneeboard";
-  if (!std::filesystem::exists(mPath)) {
-    mPath.clear();
+  if (!std::filesystem::exists(ret)) {
+    return {};
   }
+  return ret;
 }
+}// namespace
 
-bool LocalAppDataSettings::IsPresent() const {
-  return !mPath.empty();
-}
-
-void LocalAppDataSettings::Remove() {}
+LocalAppDataSettings::LocalAppDataSettings()
+  : FilesystemArtifact(GetPathForConstructor()) {}
 
 std::string_view LocalAppDataSettings::GetTitle() const {
   return "Settings in Local App Data";
@@ -36,11 +36,7 @@ std::string_view LocalAppDataSettings::GetTitle() const {
 
 void LocalAppDataSettings::DrawCardContent() const {
   namespace fuii = FredEmmott::GUI::Immediate;
-  fuii::Label("Found in {}", mPath.string());
-}
-
-Artifact::Kind LocalAppDataSettings::GetKind() const {
-  return Kind::UserSettings;
+  fuii::Label("Found in {}", GetPath().string());
 }
 
 Version LocalAppDataSettings::GetEarliestVersion() const {
@@ -49,4 +45,7 @@ Version LocalAppDataSettings::GetEarliestVersion() const {
 
 std::optional<Version> LocalAppDataSettings::GetRemovedVersion() const {
   return std::nullopt;
+}
+Artifact::Kind LocalAppDataSettings::GetKind() const {
+  return Kind::UserSettings;
 }
