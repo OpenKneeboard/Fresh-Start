@@ -7,7 +7,7 @@
 
 #include "Artifact.hpp"
 
-class HKCULayer final : public ArtifactWithDetails {
+class HKCULayer final : public Artifact {
  public:
   HKCULayer();
   ~HKCULayer() override = default;
@@ -15,7 +15,6 @@ class HKCULayer final : public ArtifactWithDetails {
   void Remove() override;
   [[nodiscard]] std::string_view GetTitle() const override;
   void DrawCardContent() const override;
-  void DrawDetails() const override;
   [[nodiscard]] Kind GetKind() const override;
   [[nodiscard]] Version GetEarliestVersion() const override;
   [[nodiscard]] std::optional<Version> GetRemovedVersion() const override;

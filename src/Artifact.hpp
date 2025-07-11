@@ -24,9 +24,3 @@ class Artifact {
   [[nodiscard]] virtual Version GetEarliestVersion() const = 0;
   [[nodiscard]] virtual std::optional<Version> GetRemovedVersion() const = 0;
 };
-
-class ArtifactWithDetails : public Artifact {
- public:
-  ~ArtifactWithDetails() override = default;
-  virtual void DrawDetails() const = 0;
-};

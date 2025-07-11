@@ -39,25 +39,19 @@ std::string_view HKCULayer::GetTitle() const {
 void HKCULayer::DrawCardContent() const {
   namespace fui = FredEmmott::GUI;
   namespace fuii = FredEmmott::GUI::Immediate;
+
   fuii::TextBlock(
     "OpenXR API layers can be installed in the registry either under "
     "HKEY_LOCAL_MACHINE (HKLM), or under HKEY_CURRENT_USER (HKCU). "
     "OpenKneeboard originally used HKCU, but now uses HKLM to improve "
-    "compatibility with other software.");
-}
+    "compatibility with other software. Found OpenKneeboard layers "
+    "installed in HKCU:");
 
-void HKCULayer::DrawDetails() const {
-  namespace fui = FredEmmott::GUI;
-  namespace fuii = FredEmmott::GUI::Immediate;
-  const auto layout
-    = fuii::BeginVStackPanel()
-        .Styled({
-          .mGap = 12,
-          .mMargin = 8,
-        })
-        .Scoped();
-  for (auto&& [index, value]: std::views::enumerate(mValues)) {
-    fuii::Label(value, fuii::ID {index});
+  const auto innerLayout = fuii::BeginVStackPanel().Scoped().Styled({
+    .mGap = 6,
+  });
+  for (auto&& value: mValues) {
+    fuii::Label("• {}", value);
   }
 }
 

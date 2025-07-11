@@ -81,10 +81,10 @@ auto& GetArtifacts() {
   if (!std::exchange(initialized, true)) {
     std::unique_ptr<Artifact> artifacts[] {
       std::make_unique<MSIXInstallation>(),
-      std::make_unique<MultipleMSIInstallations>(),
       std::make_unique<ProgramData>(),
-      std::make_unique<MSIInstallation>(),
       std::make_unique<HKCULayer>(),
+      std::make_unique<MultipleMSIInstallations>(),
+      std::make_unique<MSIInstallation>(),
       std::make_unique<HKLMLayer>(),
       std::make_unique<SavedGamesSettings>(),
       std::make_unique<LocalAppDataSettings>(),
@@ -143,10 +143,7 @@ void ShowArtifact(ArtifactState& artifact) {
         .Styled({.mColor = TextFillColorTertiaryBrush});
     }
   }
-  const auto details
-    = dynamic_cast<ArtifactWithDetails*>(artifact.mArtifact.get());
   {
-    const auto disabled = fuii::BeginEnabled(details).Scoped();
     bool clicked {false};
     const auto button
       = fuii::BeginButton(&clicked)
@@ -162,7 +159,11 @@ void ShowArtifact(ArtifactState& artifact) {
     }
   }
   if (const auto popup = fuii::BeginPopup(&artifact.mShowingDetails).Scoped()) {
-    details->DrawDetails();
+    const auto layout = fuii::BeginVStackPanel().Scoped().Styled({
+      .mGap = 12,
+      .mMargin = 8,
+    });
+    artifact.mArtifact->DrawCardContent();
   }
   fuii::ComboBox(&artifact.mSelectedOption, artifact.GetOptions())
     .Styled({
