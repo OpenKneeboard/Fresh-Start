@@ -7,6 +7,7 @@
 MSIInstallation::MSIInstallation() = default;
 
 void MSIInstallation::Remove() {}
+void MSIInstallation::Repair() {}
 
 bool MSIInstallation::IsPresent() const {
   return !GetInstallations().empty();

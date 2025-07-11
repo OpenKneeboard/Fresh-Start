@@ -24,3 +24,12 @@ class Artifact {
   [[nodiscard]] virtual Version GetEarliestVersion() const = 0;
   [[nodiscard]] virtual std::optional<Version> GetRemovedVersion() const = 0;
 };
+
+class RepairableArtifact : public virtual Artifact {
+ public:
+  ~RepairableArtifact() override = default;
+  virtual bool CanRepair() const {
+    return true;
+  }
+  virtual void Repair() = 0;
+};

@@ -7,6 +7,7 @@
 #include <winrt/base.h>
 
 #include <FredEmmott/GUI.hpp>
+#include <filesystem>
 
 #include "Versions.hpp"
 
@@ -21,17 +22,46 @@ HKLMLayer::HKLMLayer() {
   for (auto&& value: wil::make_range(
          wil::reg::value_iterator {mKey.get()}, wil::reg::value_iterator {})) {
     if (value.name.contains(L"OpenKneeboard")) {
+      mWideValues.push_back(value.name);
       mValues.push_back(winrt::to_string(value.name));
-      return;
     }
   }
+  mModernLayerPath = GetModernLayerPath();
 }
 
 bool HKLMLayer::IsPresent() const {
-  return !mValues.empty();
+  return !mWideValues.empty();
 }
 
 void HKLMLayer::Remove() {}
+
+bool HKLMLayer::CanRepair() const {
+  return mModernLayerPath.has_value();
+}
+
+std::optional<std::filesystem::path> HKLMLayer::GetModernLayerPath() const try {
+  const auto pathStr = wil::reg::try_get_value_string(
+    HKEY_LOCAL_MACHINE, L"SOFTWARE\\Fred Emmott\\OpenKneeboard", L"InstallDir");
+  if (!pathStr) {
+    return {};
+  }
+  const auto canonical = std::filesystem::canonical(
+    std::filesystem::path {pathStr.value()} / L"bin"
+    / L"OpenKneeboard-OpenXR.json");
+  if (!std::filesystem::exists(canonical)) {
+    return {};
+  }
+
+  if (std::ranges::contains(mWideValues, canonical.wstring())) {
+    return canonical;
+  }
+
+  return {};
+} catch (...) {
+  return {};
+}
+
+void HKLMLayer::Repair() {}
 
 std::string_view HKLMLayer::GetTitle() const {
   return "HKLM OpenXR API layers";

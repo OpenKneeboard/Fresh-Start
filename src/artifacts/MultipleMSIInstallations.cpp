@@ -6,7 +6,7 @@
 
 #include "Versions.hpp"
 
-MultipleMSIInstallations::MultipleMSIInstallations() : BasicMSIArtifact() {}
+MultipleMSIInstallations::MultipleMSIInstallations() {}
 
 void MultipleMSIInstallations::Remove() {}
 

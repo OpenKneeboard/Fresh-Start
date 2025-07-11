@@ -5,14 +5,18 @@
 #include <Windows.h>
 #include <wil/registry.h>
 
+#include <filesystem>
+
 #include "Artifact.hpp"
 
-class HKLMLayer final : public Artifact {
+class HKLMLayer final : public RepairableArtifact {
  public:
   HKLMLayer();
   ~HKLMLayer() override = default;
   [[nodiscard]] bool IsPresent() const override;
   void Remove() override;
+  [[nodiscard]] bool CanRepair() const override;
+  void Repair() override;
   [[nodiscard]] std::string_view GetTitle() const override;
   void DrawCardContent() const override;
   [[nodiscard]] Kind GetKind() const override;
@@ -22,4 +26,8 @@ class HKLMLayer final : public Artifact {
  private:
   wil::unique_hkey mKey;
   std::vector<std::string> mValues;
+  std::vector<std::wstring> mWideValues;
+  std::optional<std::filesystem::path> mModernLayerPath;
+
+  std::optional<std::filesystem::path> GetModernLayerPath() const;
 };

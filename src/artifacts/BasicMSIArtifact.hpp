@@ -7,7 +7,7 @@
 
 #include "Artifact.hpp"
 
-class BasicMSIArtifact : public Artifact {
+class BasicMSIArtifact : public virtual Artifact {
  public:
   BasicMSIArtifact();
   ~BasicMSIArtifact() override = default;

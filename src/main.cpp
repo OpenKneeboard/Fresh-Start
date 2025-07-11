@@ -21,6 +21,7 @@
 
 namespace fui = FredEmmott::GUI;
 namespace fuii = fui::Immediate;
+using namespace std::string_view_literals;
 
 enum class CleanupMode {
   Repair,
@@ -30,25 +31,17 @@ enum class CleanupMode {
 CleanupMode gCleanupMode = CleanupMode::Repair;
 bool gRemoveSettings = false;
 
-struct ArtifactState {
-  static constexpr auto RemovalOptions = std::array {
-    "Ignore",
-    "Remove",
-  };
+enum class Action {
+  Ignore,
+  Repair,
+  Remove,
+};
 
+struct ArtifactState {
   ArtifactState() = delete;
   explicit ArtifactState(std::unique_ptr<Artifact> artifact)
     : mArtifact(std::move(artifact)) {
-    if (mArtifact->GetKind() != Artifact::Kind::UserSettings) {
-      if (mArtifact->GetRemovedVersion().has_value()) {
-        mSelectedOption = 1;
-      }
-    }
-  }
-
-  [[nodiscard]]
-  const auto& GetOptions() const noexcept {
-    return RemovalOptions;
+    mSelectedAction = GetDefaultAction();
   }
 
   auto operator->() const {
@@ -61,8 +54,9 @@ struct ArtifactState {
   }
 
   [[nodiscard]]
-  bool IsRepairable() const {
-    return (!IsUserSettings()) && IsOutdated();
+  bool CanRepair() const {
+    const auto it = dynamic_cast<const RepairableArtifact*>(mArtifact.get());
+    return it && it->CanRepair();
   }
 
   [[nodiscard]]
@@ -70,9 +64,41 @@ struct ArtifactState {
     return mArtifact->GetRemovedVersion().has_value();
   }
 
+  [[nodiscard]]
+  Action GetDefaultAction() const {
+    if (IsUserSettings()) {
+      return Action::Ignore;
+    }
+    if (CanRepair()) {
+      return Action::Repair;
+    }
+    if (IsOutdated()) {
+      return Action::Remove;
+    }
+    return Action::Ignore;
+  }
+
+  std::span<const std::tuple<Action, std::string_view>> GetOptions() const {
+    if (CanRepair()) {
+      return RepairOptions;
+    }
+    return RemoveOptions;
+  }
+
   std::unique_ptr<Artifact> mArtifact;
-  std::size_t mSelectedOption = 0;
+  Action mSelectedAction {};
   bool mShowingDetails = false;
+
+ private:
+  static constexpr auto RemoveOptions = std::array {
+    std::tuple {Action::Ignore, "Ignore"sv},
+    std::tuple {Action::Remove, "Remove"sv},
+  };
+  static constexpr auto RepairOptions = std::array {
+    std::tuple {Action::Ignore, "Ignore"sv},
+    std::tuple {Action::Repair, "Repair"sv},
+    std::tuple {Action::Remove, "Remove"sv},
+  };
 };
 
 auto& GetArtifacts() {
@@ -165,7 +191,7 @@ void ShowArtifact(ArtifactState& artifact) {
     });
     artifact.mArtifact->DrawCardContent();
   }
-  fuii::ComboBox(&artifact.mSelectedOption, artifact.GetOptions())
+  fuii::ComboBox(&artifact.mSelectedAction, artifact.GetOptions())
     .Styled({
       .mWidth = 120,
     });
@@ -182,8 +208,10 @@ void ShowModes() {
 
   const auto haveSettings
     = std::ranges::any_of(artifacts, &ArtifactState::IsUserSettings);
-  const auto haveRepairable
-    = std::ranges::any_of(artifacts, &ArtifactState::IsRepairable);
+  const auto showRepairMode
+    = std::ranges::any_of(artifacts, [](const auto& it) {
+        return it.CanRepair() || it.GetDefaultAction() == Action::Remove;
+      });
   const auto haveNonSettings = std::ranges::any_of(
     artifacts, std::not_fn(&ArtifactState::IsUserSettings));
 
@@ -193,7 +221,7 @@ void ShowModes() {
   const auto cardLayout = fuii::BeginVStackPanel().Scoped();
 
   fuii::BeginRadioButtons();
-  if (haveRepairable) {
+  if (showRepairMode) {
     fuii::RadioButton(
       &gCleanupMode, CleanupMode::Repair, "Remove outdated components");
   }
