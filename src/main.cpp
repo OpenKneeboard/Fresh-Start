@@ -103,6 +103,7 @@ struct ArtifactState {
             return {{Action::Remove, [it = mArtifact.get()] { it->Remove(); }}};
         }
     }
+    std::unreachable();
   }
 
   [[nodiscard]]

@@ -15,6 +15,7 @@ if (MSVC)
   else ()
     add_compile_options(
       "/wd4244" # using integer literals for floats
+      "/wd4250" # inherits via dominance
       "/wd4267" # converting from larger to smaller-sized integers
       "/wd4305" # truncation from 'double' to 'float'
       "/wd4389" # ==/!= between signed and unsigned
