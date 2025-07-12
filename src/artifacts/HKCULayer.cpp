@@ -15,13 +15,14 @@ HKCULayer::HKCULayer() {
         wil::reg::open_unique_key_nothrow(
           HKEY_CURRENT_USER,
           L"Software\\Khronos\\OpenXR\\1\\ApiLayers\\Implicit",
-          mKey))) {
+          mKey,
+          wil::reg::key_access::readwrite))) {
     return;
   }
   for (auto&& value: wil::make_range(
          wil::reg::value_iterator {mKey.get()}, wil::reg::value_iterator {})) {
     if (value.name.contains(L"OpenKneeboard")) {
-      mValues.push_back(winrt::to_string(value.name));
+      mValues.emplace_back(value.name, winrt::to_string(value.name));
     }
   }
 }
@@ -30,7 +31,11 @@ bool HKCULayer::IsPresent() const {
   return !mValues.empty();
 }
 
-void HKCULayer::Remove() {}
+void HKCULayer::Remove() {
+  for (auto&& value: mValues) {
+    RegDeleteValueW(mKey.get(), value.mValueName.c_str());
+  }
+}
 
 std::string_view HKCULayer::GetTitle() const {
   return "HKCU OpenXR API layers";
@@ -51,7 +56,7 @@ void HKCULayer::DrawCardContent() const {
     .mGap = 6,
   });
   for (auto&& value: mValues) {
-    fuii::Label("• {}", value);
+    fuii::Label("• {}", value.mLabel);
   }
 }
 

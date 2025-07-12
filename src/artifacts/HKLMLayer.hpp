@@ -25,8 +25,11 @@ class HKLMLayer final : public RepairableArtifact {
 
  private:
   wil::unique_hkey mKey;
-  std::vector<std::string> mValues;
-  std::vector<std::wstring> mWideValues;
+  struct Value {
+    std::wstring mValueName;
+    std::string mLabel;
+  };
+  std::vector<Value> mValues;
   std::optional<std::filesystem::path> mModernLayerPath;
 
   std::optional<std::filesystem::path> GetModernLayerPath() const;

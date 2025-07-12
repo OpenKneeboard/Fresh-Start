@@ -79,7 +79,7 @@ struct ArtifactState {
           }
           return std::nullopt;
         }
-        if (this->IsOutdated()) {
+        if (this->IsOutdated() && !this->IsUserSettings()) {
           return {{Action::Remove, [it = mArtifact.get()] { it->Remove(); }}};
         }
         return std::nullopt;
@@ -285,7 +285,7 @@ void ShowProgress(const std::vector<Executor>& executors) {
 
   const auto dialog = fuii::BeginContentDialog().Scoped();
   if (allComplete) {
-    fuii::ContentDialogTitle("Changes applied");
+    fuii::ContentDialogTitle("Cleanup complete");
   } else {
     fuii::ContentDialogTitle("Applying changes...");
   }
@@ -368,6 +368,13 @@ void ShowModes() {
   if (showRepairMode) {
     fuii::RadioButton(
       &gCleanupMode, CleanupMode::Repair, "Remove outdated components");
+    fuii::Label("Modern components will be repaired.")
+      .Caption()
+      .Styled({
+        .mColor = fui::StaticTheme::Common::TextFillColorSecondaryBrush,
+        .mMarginTop = -6,
+        .mPaddingLeft = 32,
+      });
   }
   if (haveNonSettings) {
     fuii::RadioButton(
@@ -463,7 +470,7 @@ void AppTick(fui::Win32Window& window) {
 
   if (GetArtifacts().empty()) {
     const auto buttons = fuii::BeginContentDialogButtons().Scoped();
-    if (fuii::ContentDialogCloseButton("Close")) {
+    if (fuii::ContentDialogCloseButton("Close").Accent()) {
       throw fui::ExitException(EXIT_SUCCESS);
     }
     return;

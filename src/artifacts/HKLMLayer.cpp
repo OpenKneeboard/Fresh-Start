@@ -16,24 +16,37 @@ HKLMLayer::HKLMLayer() {
         wil::reg::open_unique_key_nothrow(
           HKEY_LOCAL_MACHINE,
           L"SOFTWARE\\Khronos\\OpenXR\\1\\ApiLayers\\Implicit",
-          mKey))) {
+          mKey,
+          wil::reg::key_access::readwrite))) {
     return;
   }
   for (auto&& value: wil::make_range(
          wil::reg::value_iterator {mKey.get()}, wil::reg::value_iterator {})) {
     if (value.name.contains(L"OpenKneeboard")) {
-      mWideValues.push_back(value.name);
-      mValues.push_back(winrt::to_string(value.name));
+      mValues.emplace_back(value.name, winrt::to_string(value.name));
     }
   }
   mModernLayerPath = GetModernLayerPath();
 }
 
 bool HKLMLayer::IsPresent() const {
-  return !mWideValues.empty();
+  return !mValues.empty();
 }
 
-void HKLMLayer::Remove() {}
+void HKLMLayer::Remove() {
+  for (auto&& value: mValues) {
+    RegDeleteValueW(mKey.get(), value.mValueName.c_str());
+  }
+}
+
+void HKLMLayer::Repair() {
+  for (auto&& value: mValues) {
+    if (value.mValueName == mModernLayerPath->wstring()) {
+      continue;
+    }
+    RegDeleteValueW(mKey.get(), value.mValueName.c_str());
+  }
+}
 
 bool HKLMLayer::CanRepair() const {
   return mModernLayerPath.has_value();
@@ -52,7 +65,7 @@ std::optional<std::filesystem::path> HKLMLayer::GetModernLayerPath() const try {
     return {};
   }
 
-  if (std::ranges::contains(mWideValues, canonical.wstring())) {
+  if (std::ranges::contains(mValues, canonical.wstring(), &Value::mValueName)) {
     return canonical;
   }
 
@@ -60,8 +73,6 @@ std::optional<std::filesystem::path> HKLMLayer::GetModernLayerPath() const try {
 } catch (...) {
   return {};
 }
-
-void HKLMLayer::Repair() {}
 
 std::string_view HKLMLayer::GetTitle() const {
   return "HKLM OpenXR API layers";
@@ -81,7 +92,7 @@ void HKLMLayer::DrawCardContent() const {
         })
         .Scoped();
   for (auto&& value: mValues) {
-    fuii::Label("• {}", value);
+    fuii::Label("• {}", value.mLabel);
   }
 }
 

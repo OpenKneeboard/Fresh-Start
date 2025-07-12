@@ -21,5 +21,9 @@ class HKCULayer final : public Artifact {
 
  private:
   wil::unique_hkey mKey;
-  std::vector<std::string> mValues;
+  struct Value {
+    std::wstring mValueName;
+    std::string mLabel;
+  };
+  std::vector<Value> mValues;
 };

@@ -4,10 +4,22 @@
 
 #include <FredEmmott/GUI.hpp>
 
+#include "Msi.h"
+
 MSIInstallation::MSIInstallation() = default;
 
-void MSIInstallation::Remove() {}
-void MSIInstallation::Repair() {}
+void MSIInstallation::Remove() {
+  MsiConfigureProductW(
+    GetInstallations().back().mProductCode.c_str(),
+    INSTALLLEVEL_DEFAULT,
+    INSTALLSTATE_ABSENT);
+}
+
+void MSIInstallation::Repair() {
+  MsiReinstallProductW(
+    GetInstallations().back().mProductCode.c_str(),
+    REINSTALLMODE_FILEREPLACE | REINSTALLMODE_MACHINEDATA);
+}
 
 bool MSIInstallation::IsPresent() const {
   return !GetInstallations().empty();
