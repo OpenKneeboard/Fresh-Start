@@ -7,6 +7,7 @@
 #include <FredEmmott/GUI/StaticTheme/ComboBox.hpp>
 #include <FredEmmott/GUI/StaticTheme/Common.hpp>
 #include <algorithm>
+#include <future>
 #include <ranges>
 
 #include "artifacts/HKCULayer.hpp"
@@ -62,6 +63,46 @@ struct ArtifactState {
   [[nodiscard]]
   bool IsOutdated() const {
     return mArtifact->GetRemovedVersion().has_value();
+  }
+
+  std::optional<std::tuple<Action, std::function<void()>>> GetExecutor() {
+    if (!mArtifact->IsPresent()) {
+      return std::nullopt;
+    }
+
+    switch (gCleanupMode) {
+      case CleanupMode::Repair:
+        if (
+          const auto it = dynamic_cast<RepairableArtifact*>(mArtifact.get())) {
+          if (it->CanRepair()) {
+            return {{Action::Repair, [it] { it->Repair(); }}};
+          }
+          return std::nullopt;
+        }
+        if (this->IsOutdated()) {
+          return {{Action::Remove, [it = mArtifact.get()] { it->Remove(); }}};
+        }
+        return std::nullopt;
+      case CleanupMode::RemoveAll:
+        if (gRemoveSettings || !this->IsUserSettings()) {
+          return {{Action::Remove, [it = mArtifact.get()] { it->Remove(); }}};
+        }
+        return std::nullopt;
+      case CleanupMode::Custom:
+        switch (mSelectedAction) {
+          case Action::Ignore:
+            return std::nullopt;
+          case Action::Repair: {
+            const auto it = dynamic_cast<RepairableArtifact*>(mArtifact.get());
+            if (it && it->CanRepair()) {
+              return {{Action::Repair, [it] { it->Repair(); }}};
+            }
+            return std::nullopt;
+          }
+          case Action::Remove:
+            return {{Action::Remove, [it = mArtifact.get()] { it->Remove(); }}};
+        }
+    }
   }
 
   [[nodiscard]]
@@ -196,6 +237,111 @@ void ShowArtifact(ArtifactState& artifact) {
       .mWidth = 120,
     });
 }
+struct Executor {
+  enum class State {
+    Pending,
+    InProgress,
+    Complete,
+  };
+
+  std::string_view mTitle;
+  Action mAction;
+  std::function<void()> mExecutor;
+  State mState {State::Pending};
+};
+
+std::vector<Executor> GetExecutors() {
+  std::vector<Executor> ret;
+  for (auto&& artifact: GetArtifacts()) {
+    if (auto it = artifact.GetExecutor()) {
+      auto&& [action, executor] = *it;
+      ret.emplace_back(
+        Executor {
+          .mTitle = artifact->GetTitle(),
+          .mAction = action,
+          .mExecutor = std::move(executor),
+        });
+    }
+  }
+  return ret;
+}
+
+void ExecutorThread(std::vector<Executor>& executors, HWND window) {
+  for (auto&& it: executors) {
+    it.mState = Executor::State::InProgress;
+    UpdateWindow(window);
+
+    it.mExecutor();
+
+    it.mState = Executor::State::Complete;
+    UpdateWindow(window);
+  }
+}
+
+void ShowProgress(const std::vector<Executor>& executors) {
+  const auto dialog = fuii::BeginContentDialog().Scoped();
+  fuii::ContentDialogTitle("Applying changes");
+
+  bool allComplete = true;
+
+  for (auto&& [i, it]: std::views::enumerate(executors)) {
+    const auto row
+      = fuii::BeginHStackPanel(fuii::ID {i})
+          .Scoped()
+          .Styled({
+            .mColor = fui::StaticTheme::Common::TextFillColorSecondaryBrush,
+            .mPaddingLeft = 8,
+          });
+    using enum Action;
+    switch (it.mAction) {
+      case Ignore:
+        throw std::logic_error("Can't take an 'ignore' action");
+      case Repair:
+        fuii::FontIcon("\ue90f");// Repair
+        break;
+      case Remove:
+        fuii::FontIcon("\ue74d");// delete
+        break;
+    }
+
+    fuii::Label(it.mTitle).Styled({
+      .mFlexGrow = 1,
+      .mMarginRight = 16,
+    });
+
+    using enum Executor::State;
+    switch (it.mState) {
+      case Pending:
+        // Checkbox glyph
+        fuii::FontIcon("\ue739").Styled({.mAlignSelf = YGAlignFlexStart});
+        allComplete = false;
+        break;
+      case InProgress:
+        // TODO: replace with a ProgressRing:
+        //  https://github.com/fredemmott/FUI/issues/62
+        // ProgressRingDots glyph
+        fuii::FontIcon("\uf16a").Styled({.mAlignSelf = YGAlignFlexStart});
+        allComplete = false;
+        break;
+      case Complete:
+        // CheckboxComposite
+        fuii::FontIcon("\ue73a").Styled({.mAlignSelf = YGAlignFlexStart});
+        break;
+    }
+  }
+
+  fuii::Label(allComplete ? "Finished!" : "Working...")
+    .BodyStrong()
+    .Styled({
+      .mMarginTop = 16,
+    });
+
+  const auto buttons = fuii::BeginContentDialogButtons().Scoped();
+  const auto disabled = fuii::BeginEnabled(allComplete).Scoped();
+  if (fuii::ContentDialogCloseButton("Close").Accent()) {
+    throw fui::ExitException(EXIT_SUCCESS);
+  }
+}
 
 void ShowModes() {
   auto& artifacts = GetArtifacts();
@@ -325,10 +471,26 @@ void AppTick(fui::Win32Window& window) {
     return;
   }
 
-  const auto buttons = fuii::BeginContentDialogButtons().Scoped();
-  fuii::ContentDialogPrimaryButton("OK").Accent();
-  if (fuii::ContentDialogCloseButton("Cancel")) {
-    throw fui::ExitException(EXIT_SUCCESS);
+  static std::vector<Executor> sExecutors;
+  static std::future<void> sExecutorThread;
+
+  {
+    const auto buttons = fuii::BeginContentDialogButtons().Scoped();
+    if (fuii::ContentDialogPrimaryButton("OK").Accent()) {
+      sExecutors = GetExecutors();
+      sExecutorThread = std::async(
+        std::launch::async,
+        ExecutorThread,
+        std::ref(sExecutors),
+        window.GetNativeHandle());
+    }
+    if (fuii::ContentDialogCloseButton("Cancel")) {
+      throw fui::ExitException(EXIT_SUCCESS);
+    }
+  }
+
+  if (!sExecutors.empty()) {
+    ShowProgress(sExecutors);
   }
 }
 
