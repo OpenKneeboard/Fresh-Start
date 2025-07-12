@@ -272,12 +272,9 @@ void ExecutorThread(std::vector<Executor>& executors, HWND window) {
     it.mState = Executor::State::InProgress;
     UpdateWindow(window);
 
-    const bool wasForegroundWindow = (window == GetForegroundWindow());
     it.mExecutor();
     // The MSI API in particular likes to give away focus when it's done
-    if (wasForegroundWindow) {
-      SetForegroundWindow(window);
-    }
+    SetForegroundWindow(window);
 
     it.mState = Executor::State::Complete;
     UpdateWindow(window);
