@@ -19,6 +19,8 @@ if (MSVC)
   # - smaller binaries are good
   # - as well as the direct increase, incremental linking breaks the SizeBench tool
   add_link_options("$<$<NOT:$<CONFIG:Debug>>:/INCREMENTAL:NO>")
+  # COMDAT folding; drops off another 1MB
+  add_link_options("$<$<NOT:$<CONFIG:Debug>>:/OPT:ICF>")
 endif ()
 
 if (${CMAKE_PROJECT_VERSION_TWEAK})
