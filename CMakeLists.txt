@@ -11,6 +11,16 @@ set(VERSION_TWEAK 0 CACHE STRING "Final numeric component of version number")
 set(VERSION_TWEAK_PREFIX "" CACHE STRING "String prefix for final component of version number")
 project(OKB-Fresh-Start VERSION 0.0.1.${VERSION_TWEAK} LANGUAGES CXX)
 
+if (MSVC)
+  # Incremental linking makes rebuilding quicker, but as of 2025-07-12, increases the binary size by ~ 1/3rd
+  # Don't do this in release builds.
+  #
+  # - we generally don't want to rebuild release builds with small changes
+  # - smaller binaries are good
+  # - as well as the direct increase, incremental linking breaks the SizeBench tool
+  add_link_options("$<$<NOT:$<CONFIG:Debug>>:/INCREMENTAL:NO>")
+endif ()
+
 if (${CMAKE_PROJECT_VERSION_TWEAK})
   set(PROJECT_READABLE_VERSION "${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}.${CMAKE_PROJECT_VERSION_PATCH}+${VERSION_TWEAK_PREFIX}${VERSION_TWEAK}")
 else ()
