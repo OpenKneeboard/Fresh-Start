@@ -6,6 +6,7 @@ It exists for a few reasons:
 
 - Uninstallers should generally not remove your personal files or settings, only what was installed
 - Microsoft imposes some limitations on MSI and MSIX installers and uninstallers that prevent a thorough uninstallation
+- CMake switched between per-machine and per-user installations. These are separate, so it was possible to have two versions 'installed' at the same time, causing conflicts
 
 **THIS TOOL IS CURRENTLY A PUBLIC BETA** - make a backup before using it.
 
