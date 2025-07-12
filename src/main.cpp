@@ -10,6 +10,7 @@
 #include <future>
 #include <ranges>
 
+#include "artifacts/DCSHooks.hpp"
 #include "artifacts/HKCULayer.hpp"
 #include "artifacts/HKLMLayer.hpp"
 #include "artifacts/LocalAppDataSettings.hpp"
@@ -154,6 +155,7 @@ auto& GetArtifacts() {
       std::make_unique<MultipleMSIInstallations>(),
       std::make_unique<MSIInstallation>(),
       std::make_unique<HKLMLayer>(),
+      std::make_unique<DCSHooks>(),
       std::make_unique<SavedGamesSettings>(),
       std::make_unique<LocalAppDataSettings>(),
     };

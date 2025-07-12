@@ -29,6 +29,8 @@ add_executable(
   Versions.hpp
   artifacts/BasicMSIArtifact.cpp
   artifacts/BasicMSIArtifact.hpp
+  artifacts/DCSHooks.cpp
+  artifacts/DCSHooks.hpp
   artifacts/FilesystemArtifact.cpp
   artifacts/FilesystemArtifact.hpp
   artifacts/HKCULayer.cpp
