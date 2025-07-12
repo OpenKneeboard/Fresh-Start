@@ -24,13 +24,18 @@ class HKLMLayer final : public RepairableArtifact {
   [[nodiscard]] std::optional<Version> GetRemovedVersion() const override;
 
  private:
-  wil::unique_hkey mKey;
+  wil::unique_hkey mKey64;
+  wil::unique_hkey mKey32;
+
   struct Value {
+    HKEY mKey {nullptr};
     std::wstring mValueName;
     std::string mLabel;
   };
   std::vector<Value> mValues;
-  std::optional<std::filesystem::path> mModernLayerPath;
+  std::optional<std::filesystem::path> mModernLayerPath64;
+  std::optional<std::filesystem::path> mModernLayerPath32;
 
-  std::optional<std::filesystem::path> GetModernLayerPath() const;
+  std::optional<std::filesystem::path> GetModernLayerPath(
+    std::wstring_view fileName) const;
 };
