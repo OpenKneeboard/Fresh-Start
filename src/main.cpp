@@ -426,7 +426,7 @@ void ShowContent(fui::Win32Window& window) {
   if (GetArtifacts().empty()) {
     window.SetResizeMode(
       fui::Window::ResizeMode::Fixed, fui::Window::ResizeMode::Fixed);
-    fuii::Label("Couldn't find any OpenKneeboard components.")
+    fuii::Label("Couldn't find anything from OpenKneeboard on your computer.")
       .Styled(ContentLayoutStyle);
     return;
   }
