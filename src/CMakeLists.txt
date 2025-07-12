@@ -39,7 +39,7 @@ add_executable(
 set_target_properties(
   main
   PROPERTIES
-  OUTPUT_NAME "OpenKneeboard-Removal-Tool"
+  OUTPUT_NAME "OpenKneeboard-Fresh-Start"
 )
 target_include_directories(main PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/include")
 
