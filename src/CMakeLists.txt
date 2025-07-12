@@ -56,3 +56,21 @@ else ()
   find_package(fredemmott-gui CONFIG REQUIRED)
 endif ()
 target_link_libraries(main PRIVATE fredemmott-gui::fredemmott-gui)
+
+if (MSVC)
+  target_link_options(
+    main
+    PRIVATE
+    # Incremental linking makes rebuilding quicker, but as of 2025-07-12, increases the binary size by ~ 1/3rd
+    # Don't do this in release builds.
+    #
+    # - we generally don't want to rebuild release builds with small changes
+    # - smaller binaries are good
+    # - as well as the direct increase, incremental linking breaks the SizeBench tool
+    "$<$<NOT:$<CONFIG:Debug>>:/INCREMENTAL:NO>"
+    # COMDAT folding; drops off another 1MB
+    "$<$<NOT:$<CONFIG:Debug>>:/OPT:ICF>"
+    # Remove unused functions and data, in particular, WinRT types
+    "$<$<NOT:$<CONFIG:Debug>>:/OPT:REF>"
+  )
+endif ()
