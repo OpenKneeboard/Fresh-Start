@@ -33,9 +33,10 @@ jobs:
       - name: Setup vcpkg binary cache
         uses: actions/cache@v4
         with:
-          key: vcpkg-${{hashFiles('vcpkg.json', 'vcpkg-configuration.json')}}
+          key: vcpkg-${{matrix.preset}}-${{hashFiles('vcpkg.json', 'vcpkg-configuration.json')}}
           path: ${{env.VCPKG_DEFAULT_BINARY_CACHE}}
       - name: Configure
+        id: configure
         shell: pwsh
         run: |
           New-Item -Type directory -Force "${{env.VCPKG_DEFAULT_BINARY_CACHE}}"
@@ -44,6 +45,15 @@ jobs:
           cmake .. --preset "${{matrix.preset}}" `
             "-DVERSION_TWEAK_PREFIX=GHA." `
             "-DVERSION_TWEAK=${{github.run_number}}"
+          echo "VersionQuad=$(Get-Content version-quad.txt)" | Out-File -Encoding utf8 -Append $Env:GITHUB_OUTPUT
       - name: Build
         working-directory: build
         run: cmake --build . --parallel
+      - name: Upload artifacts
+        if: matrix.preset == 'Release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: "OpenKneeboard-Fresh-Start-v${{steps.configure.outputs.VersionQuad}}"
+          path: |
+            build/src/OpenKneeboard-Fresh-Start.exe
+            build/src/OpenKneeboard-Fresh-Start.pdb
