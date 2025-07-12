@@ -279,10 +279,16 @@ void ExecutorThread(std::vector<Executor>& executors, HWND window) {
 }
 
 void ShowProgress(const std::vector<Executor>& executors) {
-  const auto dialog = fuii::BeginContentDialog().Scoped();
-  fuii::ContentDialogTitle("Applying changes");
+  const auto allComplete = std::ranges::all_of(executors, [](const auto& it) {
+    return it.mState == Executor::State::Complete;
+  });
 
-  bool allComplete = true;
+  const auto dialog = fuii::BeginContentDialog().Scoped();
+  if (allComplete) {
+    fuii::ContentDialogTitle("Changes applied");
+  } else {
+    fuii::ContentDialogTitle("Applying changes...");
+  }
 
   for (auto&& [i, it]: std::views::enumerate(executors)) {
     const auto row
@@ -314,14 +320,12 @@ void ShowProgress(const std::vector<Executor>& executors) {
       case Pending:
         // Checkbox glyph
         fuii::FontIcon("\ue739").Styled({.mAlignSelf = YGAlignFlexStart});
-        allComplete = false;
         break;
       case InProgress:
         // TODO: replace with a ProgressRing:
         //  https://github.com/fredemmott/FUI/issues/62
         // ProgressRingDots glyph
         fuii::FontIcon("\uf16a").Styled({.mAlignSelf = YGAlignFlexStart});
-        allComplete = false;
         break;
       case Complete:
         // CheckboxComposite
@@ -329,12 +333,6 @@ void ShowProgress(const std::vector<Executor>& executors) {
         break;
     }
   }
-
-  fuii::Label(allComplete ? "Finished!" : "Working...")
-    .BodyStrong()
-    .Styled({
-      .mMarginTop = 16,
-    });
 
   const auto buttons = fuii::BeginContentDialogButtons().Scoped();
   const auto disabled = fuii::BeginEnabled(allComplete).Scoped();
