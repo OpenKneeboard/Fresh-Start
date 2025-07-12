@@ -1,9 +1,20 @@
 set(CONFIG_HPP "${CMAKE_CURRENT_BINARY_DIR}/include/config.hpp")
+set(VERSION_RC "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
 block()
   configure_file(
     "config.hpp.in"
     "${CONFIG_HPP}"
     @ONLY
+  )
+  configure_file(
+    "version.rc.in"
+    "${VERSION_RC}.configured"
+    @ONLY
+  )
+  file(
+    GENERATE
+    OUTPUT "${VERSION_RC}"
+    INPUT "${VERSION_RC}.configured"
   )
 endblock()
 
@@ -11,6 +22,7 @@ add_executable(
   main
   WIN32
   "${CONFIG_HPP}"
+  "${VERSION_RC}"
   main.cpp
   Artifact.hpp
   Version.hpp
