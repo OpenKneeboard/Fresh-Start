@@ -63,12 +63,13 @@ BasicMSIArtifact::BasicMSIArtifact() {
           break;
         case MSIINSTALLCONTEXT_USERMANAGED:
           installation.mDescription = std::format(
-            "v{} - user-managed installation", winrt::to_string(versionString));
+            "v{} - managed per-user installation",
+            winrt::to_string(versionString));
           break;
         case MSIINSTALLCONTEXT_USERUNMANAGED:
           installation.mDescription = std::format(
-            "v{} - user-unmanaged installation",
-            winrt::to_string(versionString));
+            "v{} - per-user installation", winrt::to_string(versionString));
+          break;
         default:
           installation.mDescription = std::format(
             "v{} - unknown installation type {:#018x}",
