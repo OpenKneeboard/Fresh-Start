@@ -41,7 +41,9 @@ jobs:
           New-Item -Type directory -Force "${{env.VCPKG_DEFAULT_BINARY_CACHE}}"
           New-Item -Type directory build
           cd build
-          cmake .. --preset "${{matrix.preset}}"
+          cmake .. --preset "${{matrix.preset}}" `
+            "-DVERSION_TWEAK_PREFIX=GHA." `
+            "-DVERSION_TWEAK=${{github.run_number}}"
       - name: Build
         working-directory: build
         run: cmake --build . --parallel
