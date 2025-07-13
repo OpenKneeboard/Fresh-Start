@@ -10,6 +10,8 @@ It exists for a few reasons:
 
 **THIS TOOL IS CURRENTLY A PUBLIC BETA** - make a backup before using it.
 
+![Screenshot](screenshot.png)
+
 ## I just want to remove OpenKneeboard
 
 Remove OpenKneeboard from add/remove programs. Don't use this tool.
