@@ -23,6 +23,7 @@ add_executable(
   WIN32
   "${CONFIG_HPP}"
   "${VERSION_RC}"
+  app.exe.manifest
   main.cpp
   Artifact.hpp
   Version.hpp
