@@ -22,16 +22,8 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
     <security>
       <requestedPrivileges>
-        <!--
-          These are the default values, however there's some hidden behavior:
-
-          If we *don't* set these, 32-bit Intel builds (x86) will have file
-          virtualization enabled; this lets the process believe it's writing
-          to admin-only locations even when it can't, but it's actually
-          redirected.
-        -->
         <requestedExecutionLevel
-          level="asInvoker"
+          level="requireAdministrator"
           uiAccess="false"
         />
       </requestedPrivileges>

@@ -87,5 +87,7 @@ if (MSVC)
     "$<$<NOT:$<CONFIG:Debug>>:/OPT:ICF>"
     # Remove unused functions and data, in particular, WinRT types
     "$<$<NOT:$<CONFIG:Debug>>:/OPT:REF>"
+    # We already specify this via the manifest, but CMake tries to conflict
+    "/MANIFESTUAC:level='requireAdministrator'"
   )
 endif ()
