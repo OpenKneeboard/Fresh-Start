@@ -29,13 +29,14 @@ std::string_view MultipleMSIInstallations::GetTitle() const {
 }
 
 void MultipleMSIInstallations::DrawCardContent() const {
-  namespace fuii = FredEmmott::GUI::Immediate;
-  fuii::TextBlock(
+  using namespace FredEmmott::GUI;
+  using namespace FredEmmott::GUI::Immediate;
+  TextBlock(
     "Multiple versions of OpenKneeboard are installed via Windows "
     "Installer (MSI). This is unusual and may cause conflicts.");
-  const auto subLayout = fuii::BeginVStackPanel().Styled({.mGap = 4}).Scoped();
+  const auto subLayout = BeginVStackPanel().Styled(Style().Gap(4)).Scoped();
   for (auto&& it: GetInstallations()) {
-    fuii::Label(" • Found {}", it.mDescription);
+    Label(" • Found {}", it.mDescription);
   }
 }
 std::optional<Version> MultipleMSIInstallations::GetRemovedVersion() const {

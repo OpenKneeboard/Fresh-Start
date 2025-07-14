@@ -56,22 +56,22 @@ std::string_view DCSHooks::GetTitle() const {
 }
 
 void DCSHooks::DrawCardContent() const {
-  namespace fuii = FredEmmott::GUI::Immediate;
-  fuii::TextBlock(
+  using namespace FredEmmott::GUI;
+  using namespace FredEmmott::GUI::Immediate;
+  TextBlock(
     "DCS has a feature called 'Hooks', which allows you to run custom "
     "scripts when certain events occur. These hooks must be installed inside "
     "each DCS Saved Games folder, so are not part of the "
     "installer/uninstaller.");
-  fuii::TextBlock(
+  TextBlock(
     "These are harmless if OpenKneeboard is not installed or not running, but "
     "they can be removed to clean up. OpenKneeboard will automatically "
     "reinstall them if DCS is configured correctly within OpenKneeboard.");
-  fuii::Label("Found:");
+  Label("Found:");
 
-  const auto itemsLayout
-    = fuii::BeginVStackPanel().Scoped().Styled({.mGap = 4});
+  const auto itemsLayout = BeginVStackPanel().Scoped().Styled(Style().Gap(4));
   for (auto&& path: mPaths) {
-    fuii::Label("• {}", path.string());
+    Label("• {}", path.string());
   }
 }
 

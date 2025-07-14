@@ -2,7 +2,7 @@
   "registries": [
     {
       "kind": "git",
-      "baseline": "77bed0fee5656b27acc16eb07d1b4bca9e730c54",
+      "baseline": "a4c298f9c7790bfc1323f35687a8eb6b425bc646",
       "repository": "https://github.com/fredemmott/vcpkg-registry",
       "packages": [
         "fredemmott-gui"

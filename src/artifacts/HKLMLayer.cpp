@@ -102,20 +102,16 @@ std::string_view HKLMLayer::GetTitle() const {
 }
 
 void HKLMLayer::DrawCardContent() const {
-  namespace fuii = FredEmmott::GUI::Immediate;
-  fuii::TextBlock(
+  using namespace FredEmmott::GUI;
+  using namespace FredEmmott::GUI::Immediate;
+  TextBlock(
     "OpenXR API layers are usually installed in the registry under "
     "HKEY_LOCAL_MACHINE (HKLM). Found OpenKneeboard API layers installed in "
     "HKLM:");
 
-  const auto inner
-    = fuii::BeginVStackPanel()
-        .Styled({
-          .mGap = 8,
-        })
-        .Scoped();
+  const auto inner = BeginVStackPanel().Styled(Style().Gap(8)).Scoped();
   for (auto&& value: mValues) {
-    fuii::Label("• {}", value.mLabel);
+    Label("• {}", value.mLabel);
   }
 }
 

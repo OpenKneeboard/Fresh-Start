@@ -56,14 +56,15 @@ std::string_view MSIXInstallation::GetTitle() const {
 }
 
 void MSIXInstallation::DrawCardContent() const {
-  namespace fuii = FredEmmott::GUI::Immediate;
-  fuii::TextBlock(
+  using namespace FredEmmott::GUI;
+  using namespace FredEmmott::GUI::Immediate;
+  TextBlock(
     "MSIX is a Microsoft installation technology that OpenKneeboard no "
     "longer uses; old versions are installed:");
 
-  const auto subLayout = fuii::BeginVStackPanel().Styled({.mGap = 4}).Scoped();
+  const auto subLayout = BeginVStackPanel().Styled(Style().Gap(4)).Scoped();
   for (auto&& it: mInstallations) {
-    fuii::Label(" • Found v{}", it.mVersion);
+    Label(" • Found v{}", it.mVersion);
   }
 }
 

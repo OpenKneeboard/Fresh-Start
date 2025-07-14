@@ -21,8 +21,8 @@
 #include "artifacts/SavedGamesSettings.hpp"
 #include "config.hpp"
 
-namespace fui = FredEmmott::GUI;
-namespace fuii = fui::Immediate;
+using namespace FredEmmott::GUI;
+using namespace FredEmmott::GUI::Immediate;
 using namespace std::string_view_literals;
 
 enum class CleanupMode {
@@ -171,12 +171,7 @@ auto& GetArtifacts() {
 
 void ShowArtifact(ArtifactState& artifact) {
   const auto row
-    = fuii::BeginHStackPanel()
-        .Styled({
-          .mFlexGrow = 1,
-          .mGap = 8,
-        })
-        .Scoped();
+    = BeginHStackPanel().Styled(Style().FlexGrow(1).Gap(8)).Scoped();
   std::string_view icon;
   switch (artifact->GetKind()) {
     case Artifact::Kind::Software:
@@ -185,60 +180,53 @@ void ShowArtifact(ArtifactState& artifact) {
     case Artifact::Kind::UserSettings:
       icon = "\uEF58";// PlayerSettings
   }
-  fuii::FontIcon(icon, fui::SystemFont::Subtitle)
-    .Styled({
-      .mAlignSelf = YGAlignFlexStart,
-    });
-  using namespace fui::StaticTheme::Common;
+  FontIcon(icon, SystemFont::Subtitle)
+    .Styled(Style().AlignSelf(YGAlignFlexStart));
+  using namespace StaticTheme::Common;
   {
     const auto body
-      = fuii::BeginVStackPanel().Scoped().Styled({.mFlexGrow = 1, .mGap = 8});
-    fuii::Label(artifact->GetTitle()).Subtitle().Styled({.mFlexGrow = 1});
+      = BeginVStackPanel().Scoped().Styled(Style().FlexGrow(1).Gap(8));
+    Label(artifact->GetTitle()).Subtitle().Styled(Style().FlexGrow(1));
 
     if (artifact->GetRemovedVersion()) {
-      fuii::Label(
+      Label(
         "Obsolete: used from v{} ({}) until v{} ({})",
         artifact->GetEarliestVersion().mName,
         artifact->GetEarliestVersion().mReleaseDate,
         artifact->GetRemovedVersion()->mName,
         artifact->GetRemovedVersion()->mReleaseDate)
         .Body()
-        .Styled({.mColor = TextFillColorTertiaryBrush});
+        .Styled(Style().Color(TextFillColorTertiaryBrush));
     } else {
-      fuii::Label(
+      Label(
         "Used by current versions, starting with v{} ({})",
         artifact->GetEarliestVersion().mName,
         artifact->GetEarliestVersion().mReleaseDate)
         .Body()
-        .Styled({.mColor = TextFillColorTertiaryBrush});
+        .Styled(Style().Color(TextFillColorTertiaryBrush));
     }
   }
   {
     bool clicked {false};
     const auto button
-      = fuii::BeginButton(&clicked)
-          .Styled({
-            .mAlignSelf = YGAlignFlexStart,
-            .mHeight
-            = FredEmmott::GUI::StaticTheme::ComboBox::ComboBoxMinHeight,
-          })
+      = BeginButton(&clicked)
+          .Styled(
+            Style()
+              .AlignSelf(YGAlignFlexStart)
+              .Height(StaticTheme::ComboBox::ComboBoxMinHeight))
           .Scoped();
-    fuii::FontIcon("\uea1f");// info2
+    FontIcon("\uea1f");// info2
     if (clicked) {
       artifact.mShowingDetails = true;
     }
   }
-  if (const auto popup = fuii::BeginPopup(&artifact.mShowingDetails).Scoped()) {
-    const auto layout = fuii::BeginVStackPanel().Scoped().Styled({
-      .mGap = 12,
-      .mMargin = 8,
-    });
+  if (const auto popup = BeginPopup(&artifact.mShowingDetails).Scoped()) {
+    const auto layout
+      = BeginVStackPanel().Scoped().Styled(Style().Gap(12).Margin(8));
     artifact.mArtifact->DrawCardContent();
   }
-  fuii::ComboBox(&artifact.mSelectedAction, artifact.GetOptions())
-    .Styled({
-      .mWidth = 120,
-    });
+  ComboBox(&artifact.mSelectedAction, artifact.GetOptions())
+    .Styled(Style().Width(120));
 }
 struct Executor {
   enum class State {
@@ -288,72 +276,63 @@ void ShowProgress(const std::vector<Executor>& executors) {
     return it.mState == Executor::State::Complete;
   });
 
-  const auto dialog = fuii::BeginContentDialog().Scoped();
+  const auto dialog = BeginContentDialog().Scoped();
   if (allComplete) {
-    fuii::ContentDialogTitle("Cleanup complete");
+    ContentDialogTitle("Cleanup complete");
   } else {
-    fuii::ContentDialogTitle("Applying changes...");
+    ContentDialogTitle("Applying changes...");
   }
 
   for (auto&& [i, it]: std::views::enumerate(executors)) {
-    const auto row
-      = fuii::BeginHStackPanel(fuii::ID {i})
-          .Scoped()
-          .Styled({
-            .mColor = fui::StaticTheme::Common::TextFillColorSecondaryBrush,
-            .mPaddingLeft = 8,
-          });
+    const auto row = BeginHStackPanel(ID {i}).Scoped().Styled(
+      Style()
+        .Color(StaticTheme::Common::TextFillColorSecondaryBrush)
+        .PaddingLeft(8));
     using enum Action;
     switch (it.mAction) {
       case Ignore:
         throw std::logic_error("Can't take an 'ignore' action");
       case Repair:
-        fuii::FontIcon("\ue90f");// Repair
+        FontIcon("\ue90f");// Repair
         break;
       case Remove:
-        fuii::FontIcon("\ue74d");// delete
+        FontIcon("\ue74d");// delete
         break;
     }
 
-    fuii::Label(it.mTitle).Styled({
-      .mFlexGrow = 1,
-      .mMarginRight = 16,
-    });
+    Label(it.mTitle).Styled(Style().FlexGrow(1).MarginRight(16));
 
     using enum Executor::State;
     switch (it.mState) {
       case Pending:
         // Checkbox glyph
-        fuii::FontIcon("\ue739").Styled({.mAlignSelf = YGAlignFlexStart});
+        FontIcon("\ue739").Styled(Style().AlignSelf(YGAlignFlexStart));
         break;
       case InProgress:
         // TODO: replace with a ProgressRing:
         //  https://github.com/fredemmott/FUI/issues/62
         // ProgressRingDots glyph
-        fuii::FontIcon("\uf16a").Styled({.mAlignSelf = YGAlignFlexStart});
+        FontIcon("\uf16a").Styled(Style().AlignSelf(YGAlignFlexStart));
         break;
       case Complete:
         // CheckboxComposite
-        fuii::FontIcon("\ue73a").Styled({.mAlignSelf = YGAlignFlexStart});
+        FontIcon("\ue73a").Styled(Style().AlignSelf(YGAlignFlexStart));
         break;
     }
   }
 
-  const auto buttons = fuii::BeginContentDialogButtons().Scoped();
-  const auto disabled = fuii::BeginEnabled(allComplete).Scoped();
-  if (fuii::ContentDialogCloseButton("Close").Accent()) {
-    throw fui::ExitException(EXIT_SUCCESS);
+  const auto buttons = BeginContentDialogButtons().Scoped();
+  const auto disabled = BeginEnabled(allComplete).Scoped();
+  if (ContentDialogCloseButton("Close").Accent()) {
+    throw ExitException(EXIT_SUCCESS);
   }
 }
 
 void ShowModes() {
   auto& artifacts = GetArtifacts();
 
-  fuii::Label(
-    "Your computer contains files or components created by OpenKneeboard.")
-    .Styled({
-      .mColor = fui::StaticTheme::Common::TextFillColorTertiaryBrush,
-    });
+  Label("Your computer contains files or components created by OpenKneeboard.")
+    .Styled(Style().Color(StaticTheme::Common::TextFillColorTertiaryBrush));
 
   const auto haveSettings
     = std::ranges::any_of(artifacts, &ArtifactState::IsUserSettings);
@@ -364,119 +343,105 @@ void ShowModes() {
   const auto haveNonSettings = std::ranges::any_of(
     artifacts, std::not_fn(&ArtifactState::IsUserSettings));
 
-  fuii::Label("Clean up OpenKneeboard").Subtitle();
+  Label("Clean up OpenKneeboard").Subtitle();
 
-  const auto card = fuii::BeginCard().Scoped();
-  const auto cardLayout = fuii::BeginVStackPanel().Scoped();
+  const auto card = BeginCard().Scoped();
+  const auto cardLayout = BeginVStackPanel().Scoped();
 
-  fuii::BeginRadioButtons();
+  BeginRadioButtons();
   if (showRepairMode) {
-    fuii::RadioButton(
+    RadioButton(
       &gCleanupMode, CleanupMode::Repair, "Remove outdated components");
-    fuii::Label("Modern components will be repaired.")
+    Label("Modern components will be repaired.")
       .Caption()
-      .Styled({
-        .mColor = fui::StaticTheme::Common::TextFillColorSecondaryBrush,
-        .mMarginTop = -6,
-        .mPaddingLeft = 32,
-      });
+      .Styled(
+        Style()
+          .Color(StaticTheme::Common::TextFillColorSecondaryBrush)
+          .MarginTop(-6)
+          .PaddingLeft(32));
   }
   if (haveNonSettings) {
-    fuii::RadioButton(
-      &gCleanupMode, CleanupMode::RemoveAll, "Remove everything");
+    RadioButton(&gCleanupMode, CleanupMode::RemoveAll, "Remove everything");
     if (haveSettings) {
       const auto enabled
-        = fuii::BeginEnabled(gCleanupMode == CleanupMode::RemoveAll).Scoped();
-      fuii::CheckBox(&gRemoveSettings, "Delete your settings")
-        .Styled({.mPaddingLeft = 32});
+        = BeginEnabled(gCleanupMode == CleanupMode::RemoveAll).Scoped();
+      CheckBox(&gRemoveSettings, "Delete your settings")
+        .Styled(Style().PaddingLeft(32));
     }
   } else {
     gRemoveSettings = true;
     if (gCleanupMode == CleanupMode::Repair) {
       gCleanupMode = CleanupMode::RemoveAll;
     }
-    fuii::RadioButton(
-      &gCleanupMode, CleanupMode::RemoveAll, "Delete your settings");
+    RadioButton(&gCleanupMode, CleanupMode::RemoveAll, "Delete your settings");
   }
-  fuii::RadioButton(&gCleanupMode, CleanupMode::Custom, "Customize");
-  fuii::EndRadioButtons();
+  RadioButton(&gCleanupMode, CleanupMode::Custom, "Customize");
+  EndRadioButtons();
 }
 
 void ShowArtifacts() {
-  fuii::Label("Details").Subtitle();
-  const auto card = fuii::BeginCard().Scoped().Styled({
-    .mFlexDirection = YGFlexDirectionColumn,
-    .mGap = 12,
-  });
+  Label("Details").Subtitle();
+  const auto card = BeginCard().Scoped().Styled(
+    Style().FlexDirection(YGFlexDirectionColumn).Gap(12));
 
   for (auto&& [index, artifact]: std::views::enumerate(GetArtifacts())) {
-    const auto popId = fuii::PushID(index).Scoped();
+    const auto popId = PushID(index).Scoped();
     ShowArtifact(artifact);
   }
 }
 
-void ShowContent(fui::Win32Window& window) {
-  static const fui::Style ContentLayoutStyle {
-    .mFlexGrow = 1,
-    .mGap = 12,
-    .mMargin = 12,
-    .mPadding = 8,
-  };
+void ShowContent(Win32Window& window) {
+  static const Style ContentLayoutStyle
+    = Style().FlexGrow(1).Gap(12).Margin(12).Padding(8);
 
   if (GetArtifacts().empty()) {
-    window.SetResizeMode(
-      fui::Window::ResizeMode::Fixed, fui::Window::ResizeMode::Fixed);
-    fuii::Label("Couldn't find anything from OpenKneeboard on your computer.")
+    window.SetResizeMode(Window::ResizeMode::Fixed, Window::ResizeMode::Fixed);
+    Label("Couldn't find anything from OpenKneeboard on your computer.")
       .Styled(ContentLayoutStyle);
     return;
   }
 
   if (gCleanupMode != CleanupMode::Custom) {
-    window.SetResizeMode(
-      fui::Window::ResizeMode::Fixed, fui::Window::ResizeMode::Fixed);
-    const auto layout
-      = fuii::BeginVStackPanel().Styled(ContentLayoutStyle).Scoped();
+    window.SetResizeMode(Window::ResizeMode::Fixed, Window::ResizeMode::Fixed);
+    const auto layout = BeginVStackPanel().Styled(ContentLayoutStyle).Scoped();
     ShowModes();
     return;
   }
 
   window.SetResizeMode(
-    fui::Window::ResizeMode::Fixed, fui::Window::ResizeMode::AllowShrink);
-  const auto scroll = fuii::BeginVScrollView().Scoped().Styled({
-    .mFlexGrow = 1,
-    .mFlexShrink = 1,
-  });
-  const auto layout
-    = fuii::BeginVStackPanel().Scoped().Styled(ContentLayoutStyle);
+    Window::ResizeMode::Fixed, Window::ResizeMode::AllowShrink);
+  const auto scroll
+    = BeginVScrollView().Scoped().Styled(Style().FlexGrow(1).FlexShrink(1));
+  const auto layout = BeginVStackPanel().Scoped().Styled(ContentLayoutStyle);
   ShowModes();
   ShowArtifacts();
 }
 
-void AppTick(fui::Win32Window& window) {
+void AppTick(Win32Window& window) {
   const auto resizeIfNeeded
     = wil::scope_exit([wasCustom = gCleanupMode == CleanupMode::Custom] {
         const auto isCustom = gCleanupMode == CleanupMode::Custom;
         if (wasCustom != isCustom) {
-          fuii::ResizeToFit();
+          ResizeToFit();
         }
       });
 
   const auto outer
-    = fuii::BeginVStackPanel()
-        .Styled({
-          .mBackgroundColor
-          = fui::StaticTheme::Common::LayerOnAcrylicFillColorDefaultBrush,
-          .mFlexGrow = 1,
-          .mGap = 0,
-        })
+    = BeginVStackPanel()
+        .Styled(
+          Style()
+            .BackgroundColor(
+              StaticTheme::Common::LayerOnAcrylicFillColorDefaultBrush)
+            .FlexGrow(1)
+            .Gap(0))
         .Scoped();
 
   ShowContent(window);
 
   if (GetArtifacts().empty()) {
-    const auto buttons = fuii::BeginContentDialogButtons().Scoped();
-    if (fuii::ContentDialogCloseButton("Close").Accent()) {
-      throw fui::ExitException(EXIT_SUCCESS);
+    const auto buttons = BeginContentDialogButtons().Scoped();
+    if (ContentDialogCloseButton("Close").Accent()) {
+      throw ExitException(EXIT_SUCCESS);
     }
     return;
   }
@@ -485,8 +450,8 @@ void AppTick(fui::Win32Window& window) {
   static std::future<void> sExecutorThread;
 
   {
-    const auto buttons = fuii::BeginContentDialogButtons().Scoped();
-    if (fuii::ContentDialogPrimaryButton("OK").Accent()) {
+    const auto buttons = BeginContentDialogButtons().Scoped();
+    if (ContentDialogPrimaryButton("OK").Accent()) {
       sExecutors = GetExecutors();
       sExecutorThread = std::async(
         std::launch::async,
@@ -494,8 +459,8 @@ void AppTick(fui::Win32Window& window) {
         std::ref(sExecutors),
         window.GetNativeHandle());
     }
-    if (fuii::ContentDialogCloseButton("Cancel")) {
-      throw fui::ExitException(EXIT_SUCCESS);
+    if (ContentDialogCloseButton("Cancel")) {
+      throw ExitException(EXIT_SUCCESS);
     }
   }
 
@@ -509,10 +474,10 @@ int WINAPI wWinMain(
   [[maybe_unused]] HINSTANCE hPrevInstance,
   [[maybe_unused]] PWSTR pCmdLine,
   [[maybe_unused]] int nCmdShow) {
-  fui::WindowOptions options {
-    .mTitle = std::format("OKB Fresh Start v{}", Config::Version::Readable),
+  WindowOptions options {
+    .mTitle = std::format("OKB Fresh Start v{}", ::Config::Version::Readable),
   };
   options.mWindowExStyle |= WS_EX_DLGMODALFRAME;
-  return fui::Win32Window::WinMain(
+  return Win32Window::WinMain(
     hInstance, hPrevInstance, pCmdLine, nCmdShow, &AppTick, options);
 }
