@@ -20,6 +20,7 @@
 #include "artifacts/ProgramData.hpp"
 #include "artifacts/SavedGamesSettings.hpp"
 #include "config.hpp"
+#include "licenses.hpp"
 
 using namespace FredEmmott::GUI;
 using namespace FredEmmott::GUI::Immediate;
@@ -390,14 +391,86 @@ void ShowArtifacts() {
   }
 }
 
+void ShowLicenses() {
+  enum class Products { Self, CompressedEmbed, WIL, FUI, Yoga };
+  constexpr std::array ProductLabels {
+    std::tuple {Products::Self, "OpenKneeboard Fresh Start"},
+    std::tuple {Products::CompressedEmbed, "compressed-embed"},
+    std::tuple {Products::FUI, "FredEmmott::GUI"},
+    std::tuple {Products::WIL, "Windows Implementation Library"},
+    std::tuple {Products::Yoga, "Yoga"},
+  };
+  static const Licenses licenses {};
+  static auto key {Products::Self};
+
+  const auto layout
+    = BeginVStackPanel().Styled(Style().FlexGrow(1).Gap(12)).Scoped();
+
+  {
+    const auto card = BeginCard().Scoped();
+    TextBlock(
+      "Copyright © 2025-present Frederick Emmott\n"
+      "All rights reserved.\n"
+      "\n"
+      "This product contains third-party software components which are "
+      "licensed separately.\n"
+      "\n"
+      "Select a component below to view copyright and license information.")
+      .Body();
+  }
+
+  ComboBox(&key, ProductLabels)
+    .Styled(Style().AlignSelf(YGAlignStretch))
+    .Caption("Component");
+
+  std::string_view license;
+  switch (key) {
+    case Products::Self:
+      license = licenses.SelfAsStringView();
+      break;
+    case Products::CompressedEmbed:
+      license = licenses.CompressedEmbedAsStringView();
+      break;
+    case Products::WIL:
+      license = licenses.WILAsStringView();
+      break;
+    case Products::FUI:
+      license = licenses.FUIAsStringView();
+      break;
+    case Products::Yoga:
+      license = licenses.YogaAsStringView();
+      break;
+  }
+
+  const auto card = BeginCard().Scoped();
+  const auto scroll
+    = BeginVScrollView().Scoped().Styled(Style().Width(800).Height(600));
+  TextBlock(license);
+}
+
+void ShowLicensesButton() {
+  static bool licensesDialog {false};
+  if (HyperlinkButton("Show copyright notices")) {
+    licensesDialog = true;
+  }
+  if (auto dialog = BeginContentDialog(&licensesDialog).Scoped()) {
+    ContentDialogTitle("Copyright notices");
+    ShowLicenses();
+    const auto buttons = BeginContentDialogButtons().Scoped();
+    ContentDialogCloseButton("Close").Accent();
+  }
+}
+
 void ShowContent(Win32Window& window) {
   static const Style ContentLayoutStyle
     = Style().FlexGrow(1).Gap(12).Margin(12).Padding(8);
 
   if (GetArtifacts().empty()) {
     window.SetResizeMode(Window::ResizeMode::Fixed, Window::ResizeMode::Fixed);
+    const auto layout = BeginVStackPanel().Styled(ContentLayoutStyle).Scoped();
     Label("Couldn't find anything from OpenKneeboard on your computer.")
       .Styled(ContentLayoutStyle);
+    ShowLicensesButton();
     return;
   }
 
@@ -405,6 +478,7 @@ void ShowContent(Win32Window& window) {
     window.SetResizeMode(Window::ResizeMode::Fixed, Window::ResizeMode::Fixed);
     const auto layout = BeginVStackPanel().Styled(ContentLayoutStyle).Scoped();
     ShowModes();
+    ShowLicensesButton();
     return;
   }
 
@@ -415,6 +489,7 @@ void ShowContent(Win32Window& window) {
   const auto layout = BeginVStackPanel().Scoped().Styled(ContentLayoutStyle);
   ShowModes();
   ShowArtifacts();
+  ShowLicensesButton();
 }
 
 void AppTick(Win32Window& window) {

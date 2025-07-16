@@ -91,3 +91,20 @@ if (MSVC)
     "/MANIFESTUAC:level='requireAdministrator'"
   )
 endif ()
+
+find_package(compressed-embed CONFIG REQUIRED)
+include(CompressedEmbed)
+add_compressed_embed_library(
+  licenses
+  OUTPUT_CPP "${CMAKE_CURRENT_BINARY_DIR}/licenses.cpp"
+  OUTPUT_HPP "${CMAKE_CURRENT_BINARY_DIR}/include/licenses.hpp"
+  CLASSNAME Licenses
+  INPUTS
+  Self "${PROJECT_SOURCE_DIR}/LICENSE"
+  CompressedEmbed "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/compressed-embed/copyright"
+  FUI "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/fredemmott-gui/copyright"
+  WIL "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/wil/copyright"
+  Yoga "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/yoga/copyright"
+)
+target_include_directories(licenses PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/include")
+target_link_libraries(main PRIVATE licenses)

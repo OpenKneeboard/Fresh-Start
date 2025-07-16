@@ -4,7 +4,9 @@
       "kind": "git",
       "baseline": "a4c298f9c7790bfc1323f35687a8eb6b425bc646",
       "repository": "https://github.com/fredemmott/vcpkg-registry",
+      "baseline": "2d5a6b93b5f5f1194eda1dbbb8e1d14ab99eb6cd",
       "packages": [
+        "compressed-embed",
         "fredemmott-gui"
       ]
     }
