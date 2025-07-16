@@ -2,7 +2,7 @@
   "registries": [
     {
       "kind": "git",
-      "baseline": "2d5a6b93b5f5f1194eda1dbbb8e1d14ab99eb6cd",
+      "baseline": "ffb4f11a81bc92bce1cb52277f614469328997f9",
       "repository": "https://github.com/fredemmott/vcpkg-registry",
       "packages": [
         "compressed-embed",
