@@ -392,16 +392,18 @@ void ShowArtifacts() {
 }
 
 void ShowLicenses() {
-  enum class Products { Self, CompressedEmbed, WIL, FUI, Yoga };
-  constexpr std::array ProductLabels {
-    std::tuple {Products::Self, "OpenKneeboard Fresh Start"},
-    std::tuple {Products::CompressedEmbed, "compressed-embed"},
-    std::tuple {Products::FUI, "FredEmmott::GUI"},
-    std::tuple {Products::WIL, "Windows Implementation Library"},
-    std::tuple {Products::Yoga, "Yoga"},
+  struct Product {
+    std::string_view mName;
+    std::string_view mLicense;
   };
   static const Licenses licenses {};
-  static auto key {Products::Self};
+  static const std::array Products {
+    Product {"OpenKneeboard Fresh Start", licenses.SelfAsStringView()},
+    Product {"Compressed-Embed", licenses.CompressedEmbedAsStringView()},
+    Product {"FredEmmott::GUI", licenses.FUIAsStringView()},
+    Product {"Windows Implementation Library", licenses.WILAsStringView()},
+    Product {"Yoga", licenses.YogaAsStringView()},
+  };
 
   const auto layout
     = BeginVStackPanel().Styled(Style().FlexGrow(1).Gap(12)).Scoped();
@@ -419,33 +421,15 @@ void ShowLicenses() {
       .Body();
   }
 
-  ComboBox(&key, ProductLabels)
+  static std::size_t selectedIndex {};
+  ComboBox(&selectedIndex, Products, &Product::mName)
     .Styled(Style().AlignSelf(YGAlignStretch))
     .Caption("Component");
-
-  std::string_view license;
-  switch (key) {
-    case Products::Self:
-      license = licenses.SelfAsStringView();
-      break;
-    case Products::CompressedEmbed:
-      license = licenses.CompressedEmbedAsStringView();
-      break;
-    case Products::WIL:
-      license = licenses.WILAsStringView();
-      break;
-    case Products::FUI:
-      license = licenses.FUIAsStringView();
-      break;
-    case Products::Yoga:
-      license = licenses.YogaAsStringView();
-      break;
-  }
 
   const auto card = BeginCard().Scoped();
   const auto scroll
     = BeginVScrollView().Scoped().Styled(Style().Width(800).Height(600));
-  TextBlock(license);
+  TextBlock(Products.at(selectedIndex).mLicense);
 }
 
 void ShowLicensesButton() {
