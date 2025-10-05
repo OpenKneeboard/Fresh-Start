@@ -24,12 +24,7 @@ std::filesystem::path GetPathForConstructor() {
     return {};
   }
 
-  for (auto&& file: std::filesystem::directory_iterator {ret}) {
-    if (file.path().extension() == L".json") {
-      return ret;
-    }
-  }
-  return {};
+  return ret;
 }
 }// namespace
 
