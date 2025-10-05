@@ -10,14 +10,15 @@
 #include <future>
 #include <ranges>
 
+#include "artifacts/BackupsFolder.hpp"
 #include "artifacts/DCSHooks.hpp"
 #include "artifacts/HKCULayer.hpp"
 #include "artifacts/HKLMLayer.hpp"
 #include "artifacts/LocalAppDataSettings.hpp"
+#include "artifacts/LogsFolder.hpp"
 #include "artifacts/MSIInstallation.hpp"
 #include "artifacts/MSIXInstallation.hpp"
 #include "artifacts/MultipleMSIInstallations.hpp"
-#include "artifacts/LogsFolder.hpp"
 #include "artifacts/ProgramData.hpp"
 #include "artifacts/SavedGamesSettings.hpp"
 #include "config.hpp"
@@ -161,6 +162,7 @@ auto& GetArtifacts() {
       std::make_unique<SavedGamesSettings>(),
       std::make_unique<LocalAppDataSettings>(),
       std::make_unique<LogsFolder>(),
+      std::make_unique<BackupsFolder>(),
     };
     for (auto&& it: artifacts) {
       if (!it->IsPresent()) {

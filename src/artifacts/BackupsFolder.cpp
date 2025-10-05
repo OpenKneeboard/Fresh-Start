@@ -1,6 +1,6 @@
 // Copyright 2025 Fred Emmott <fred@fredemmott.com>
 // SPDX-License-Identifier: MIT
-#include "LogsFolder.hpp"
+#include "BackupsFolder.hpp"
 
 #include <Windows.h>
 #include <shlobj_core.h>
@@ -19,7 +19,7 @@ std::filesystem::path GetPathForConstructor() {
     return {};
   }
   const auto ret
-    = std::filesystem::path {std::wstring_view {path.get()}} / L"OpenKneeboard Logs";
+    = std::filesystem::path {std::wstring_view {path.get()}} / L"OpenKneeboard Backups";
   if (!std::filesystem::exists(ret)) {
     return {};
   }
@@ -27,25 +27,25 @@ std::filesystem::path GetPathForConstructor() {
 }
 }// namespace
 
-LogsFolder::LogsFolder()
+BackupsFolder::BackupsFolder()
   : FilesystemArtifact(GetPathForConstructor()) {}
 
-std::string_view LogsFolder::GetTitle() const {
-  return "Logs or crash dumps";
+std::string_view BackupsFolder::GetTitle() const {
+  return "Settings Backups";
 }
 
-void LogsFolder::DrawCardContent() const {
+void BackupsFolder::DrawCardContent() const {
   namespace fuii = FredEmmott::GUI::Immediate;
   fuii::Label("Found in {}", GetPath().string());
 }
 
-Version LogsFolder::GetEarliestVersion() const {
+Version BackupsFolder::GetEarliestVersion() const {
   return Versions::v1_10;
 }
 
-std::optional<Version> LogsFolder::GetRemovedVersion() const {
+std::optional<Version> BackupsFolder::GetRemovedVersion() const {
   return std::nullopt;
 }
-Artifact::Kind LogsFolder::GetKind() const {
-  return Kind::Logs;
+Artifact::Kind BackupsFolder::GetKind() const {
+  return Kind::UserSettings;
 }

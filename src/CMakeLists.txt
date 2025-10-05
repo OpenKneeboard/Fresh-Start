@@ -28,6 +28,8 @@ add_executable(
   Artifact.hpp
   Version.hpp
   Versions.hpp
+  artifacts/BackupsFolder.cpp
+  artifacts/BackupsFolder.hpp
   artifacts/BasicMSIArtifact.cpp
   artifacts/BasicMSIArtifact.hpp
   artifacts/DCSHooks.cpp
