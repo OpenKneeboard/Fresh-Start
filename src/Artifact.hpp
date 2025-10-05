@@ -12,6 +12,7 @@ class Artifact {
     Software,
     UserSettings,
     Logs,
+    TemporaryFiles,
   };
   virtual ~Artifact() = default;
 

@@ -52,6 +52,8 @@ add_executable(
   artifacts/ProgramData.hpp
   artifacts/SavedGamesSettings.cpp
   artifacts/SavedGamesSettings.hpp
+  artifacts/TemporaryFilesFolder.cpp
+  artifacts/TemporaryFilesFolder.hpp
   artifacts/LogsFolder.cpp
   artifacts/LogsFolder.hpp
 )

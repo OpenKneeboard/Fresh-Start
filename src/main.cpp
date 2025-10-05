@@ -21,6 +21,7 @@
 #include "artifacts/MultipleMSIInstallations.hpp"
 #include "artifacts/ProgramData.hpp"
 #include "artifacts/SavedGamesSettings.hpp"
+#include "artifacts/TemporaryFilesFolder.hpp"
 #include "config.hpp"
 #include "licenses.hpp"
 
@@ -77,13 +78,13 @@ struct ArtifactState {
     switch (gCleanupMode) {
       case CleanupMode::Repair:
         if (
-          const auto it = dynamic_cast<RepairableArtifact*>(mArtifact.get())) {
-          if (it->CanRepair()) {
-            return {{Action::Repair, [it] { it->Repair(); }}};
-          }
-          return std::nullopt;
+          const auto it = dynamic_cast<RepairableArtifact*>(mArtifact.get()); it && it->CanRepair()) {
+          return {{Action::Repair, [it] { it->Repair(); }}};
         }
         if (this->IsOutdated() && !this->IsUserSettings()) {
+          return {{Action::Remove, [it = mArtifact.get()] { it->Remove(); }}};
+        }
+        if (mArtifact->GetKind() == Artifact::Kind::TemporaryFiles) {
           return {{Action::Remove, [it = mArtifact.get()] { it->Remove(); }}};
         }
         return std::nullopt;
@@ -119,6 +120,9 @@ struct ArtifactState {
       return Action::Repair;
     }
     if (IsOutdated()) {
+      return Action::Remove;
+    }
+    if (mArtifact->GetKind() == Artifact::Kind::TemporaryFiles) {
       return Action::Remove;
     }
     return Action::Ignore;
@@ -163,6 +167,7 @@ auto& GetArtifacts() {
       std::make_unique<LocalAppDataSettings>(),
       std::make_unique<LogsFolder>(),
       std::make_unique<BackupsFolder>(),
+      std::make_unique<TemporaryFilesFolder>(),
     };
     for (auto&& it: artifacts) {
       if (!it->IsPresent()) {
@@ -187,6 +192,9 @@ void ShowArtifact(ArtifactState& artifact) {
       break;
     case Artifact::Kind::Logs:
       icon = "\uE9A4";// TextBulletListSquare
+      break;
+    case Artifact::Kind::TemporaryFiles:
+      icon = "\uE74D";//Delete
       break;
   }
   FontIcon(icon, SystemFont::Subtitle)
