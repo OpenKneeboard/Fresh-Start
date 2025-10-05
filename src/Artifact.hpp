@@ -11,6 +11,7 @@ class Artifact {
   enum class Kind {
     Software,
     UserSettings,
+    Logs,
   };
   virtual ~Artifact() = default;
 

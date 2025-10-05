@@ -17,6 +17,7 @@
 #include "artifacts/MSIInstallation.hpp"
 #include "artifacts/MSIXInstallation.hpp"
 #include "artifacts/MultipleMSIInstallations.hpp"
+#include "artifacts/LogsFolder.hpp"
 #include "artifacts/ProgramData.hpp"
 #include "artifacts/SavedGamesSettings.hpp"
 #include "config.hpp"
@@ -159,6 +160,7 @@ auto& GetArtifacts() {
       std::make_unique<DCSHooks>(),
       std::make_unique<SavedGamesSettings>(),
       std::make_unique<LocalAppDataSettings>(),
+      std::make_unique<LogsFolder>(),
     };
     for (auto&& it: artifacts) {
       if (!it->IsPresent()) {
@@ -180,6 +182,10 @@ void ShowArtifact(ArtifactState& artifact) {
       break;
     case Artifact::Kind::UserSettings:
       icon = "\uEF58";// PlayerSettings
+      break;
+    case Artifact::Kind::Logs:
+      icon = "\uE9A4";// TextBulletListSquare
+      break;
   }
   FontIcon(icon, SystemFont::Subtitle)
     .Styled(Style().AlignSelf(YGAlignFlexStart));

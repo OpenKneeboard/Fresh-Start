@@ -50,6 +50,8 @@ add_executable(
   artifacts/ProgramData.hpp
   artifacts/SavedGamesSettings.cpp
   artifacts/SavedGamesSettings.hpp
+  artifacts/LogsFolder.cpp
+  artifacts/LogsFolder.hpp
 )
 set_target_properties(
   main
