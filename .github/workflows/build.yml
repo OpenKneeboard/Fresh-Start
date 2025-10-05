@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         preset:
-          - Debug
+          - Debug - MSVC
           - Debug - clang-cl
           - Release
     name: "${{matrix.preset}}"
