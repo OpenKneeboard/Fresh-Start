@@ -8,9 +8,11 @@ It exists for a few reasons:
 - Microsoft imposes some limitations on MSI and MSIX installers and uninstallers that prevent a thorough uninstallation
 - CMake switched between per-machine and per-user installations. These are separate, so it was possible to have two versions 'installed' at the same time, causing conflicts
 
-**THIS TOOL IS CURRENTLY A PUBLIC BETA** - make a backup before using it.
-
 ![Screenshot](screenshot.png)
+
+## ⚠️ WARNING
+
+If you use this tool to remove OpenKneeboard folders such as settings folders, the entire folder will be deleted, including both your settings and any other files you may have chosen to put in the settings folder.
 
 ## I just want to remove OpenKneeboard
 
