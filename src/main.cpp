@@ -366,7 +366,10 @@ void ShowModes() {
           .Color(StaticTheme::Common::TextFillColorSecondaryBrush)
           .MarginTop(-6)
           .PaddingLeft(32));
+  } else if (gCleanupMode == CleanupMode::Repair) {
+    gCleanupMode = CleanupMode::RemoveAll;
   }
+
   if (haveNonSettings) {
     RadioButton(&gCleanupMode, CleanupMode::RemoveAll, "Remove everything");
     if (haveSettings) {
@@ -377,9 +380,6 @@ void ShowModes() {
     }
   } else {
     gRemoveSettings = true;
-    if (gCleanupMode == CleanupMode::Repair) {
-      gCleanupMode = CleanupMode::RemoveAll;
-    }
     RadioButton(&gCleanupMode, CleanupMode::RemoveAll, "Delete your settings");
   }
   RadioButton(&gCleanupMode, CleanupMode::Custom, "Customize");
